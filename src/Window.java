@@ -15,7 +15,8 @@ public class Window extends Application {
     private Node player;
     private ImageView astronautV;
     private AnimationTimer timer;
-    private Boolean hasJumped = false;
+    private Boolean isJumping = false;
+    private Boolean isFalling = false;
     private int position = 1;
     private ImageView imgV;
 
@@ -116,7 +117,7 @@ public class Window extends Application {
                 jump();
                 break;
             case W:
-                if (!hasJumped && !root.getChildren().contains(imgV)) {
+                if (!isJumping && !root.getChildren().contains(imgV)) {
 
                     if (position == 1) {
 
@@ -164,7 +165,7 @@ public class Window extends Application {
             root.getChildren().remove(imgV);
         }
 
-        if (hasJumped) {
+        if (isJumping || isFalling) {
             astronautV.setImage(new Image("BestAstronautFlyingRight.png"));
         } else {
             astronautV.setImage(new Image("BestAstronautRight.png"));
@@ -181,7 +182,7 @@ public class Window extends Application {
             root.getChildren().remove(imgV);
         }
 
-        if (hasJumped) {
+        if (isJumping || isFalling) {
             astronautV.setImage(new Image("BestAstronautFlyingLeft.png"));
         } else {
             astronautV.setImage(new Image("BestAstronautLeft.png"));
@@ -190,27 +191,47 @@ public class Window extends Application {
     }
 
     private void jump() {
-        hasJumped = true;
-        if (root.getChildren().contains(imgV)) {
-            root.getChildren().remove(imgV);
-        }
-        if (position == 1) {
-            astronautV.setImage(new Image("BestAstronautFlyingRight.png"));
 
-        } else if (position == 0) {
-            astronautV.setImage(new Image("BestAstronautFlyingLeft.png"));
+        if (!isFalling) {
+            isJumping = true;
 
+            if (root.getChildren().contains(imgV)) {
+                root.getChildren().remove(imgV);
+            }
+            if (position == 1) {
+                astronautV.setImage(new Image("BestAstronautFlyingRight.png"));
+
+            } else if (position == 0) {
+                astronautV.setImage(new Image("BestAstronautFlyingLeft.png"));
+
+            }
         }
     }
 
     private void jumpingMechanics() {
-
-        if (hasJumped) {
+        System.out.println(player.getTranslateY());
+        if (isJumping) {
 
             player.setTranslateY(player.getTranslateY() - 5);
         }
-        if (player.getTranslateX() < -1300) {
-            hasJumped = false;
+        if (player.getTranslateY() < -300) {
+            isFalling = true;
+            isJumping = false;
+        }
+        if (player.getTranslateY() == 0) {
+            isFalling = false;
+            isJumping = false;
+
+            if (position == 1) {
+                astronautV.setImage(new Image("BestAstronautRight.png"));
+
+            } else if (position == 0) {
+                astronautV.setImage(new Image("BestAstronautLeft.png"));
+
+            }
+
+        }
+        if (isFalling) {
             player.setTranslateY(player.getTranslateY() + 5);
         }
 
