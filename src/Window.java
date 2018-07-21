@@ -1,13 +1,10 @@
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
+import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
-
 import javafx.stage.Stage;
 
 public class Window extends Application {
@@ -17,6 +14,11 @@ public class Window extends Application {
     private static int tileSize = 32;
     private Node player;
     private ImageView astronautV;
+    private AnimationTimer timer;
+    private Boolean hasJumped = false;
+    private int position = 1;
+    private ImageView imgV;
+
     public void run() {
         launch(Window.class);
     }
@@ -65,6 +67,18 @@ public class Window extends Application {
 
         root.getChildren().add(player);
 
+        timer = new AnimationTimer() {
+
+            @Override
+            public void handle(long a) {
+                jumpingMechanics();
+
+            }
+
+        };
+
+        timer.start();
+
         return root;
     }
 
@@ -78,8 +92,8 @@ public class Window extends Application {
         astronautV.setFitHeight(200);
 
         return astronautV;
-    }  
-    
+    }
+
     @Override
     public void start(Stage stage) throws Exception {
         Scene scene = new Scene(createMenu());
@@ -88,18 +102,47 @@ public class Window extends Application {
         stage.setMaxHeight(700);
         stage.setTitle("Space Combat™");
         stage.getIcons().add(new Image("SpaceCombatIcon.png"));
-        
+
         stage.getScene().setOnKeyPressed(event -> {
             switch (event.getCode()) {
-            case RIGHT:                
+            case RIGHT:
                 moveRight();
                 break;
             case LEFT:
                 moveLeft();
-                
+
                 break;
             case UP:
                 jump();
+                break;
+            case W:
+                if (!hasJumped && !root.getChildren().contains(imgV)) {
+
+                    if (position == 1) {
+
+                        Image img = new Image("MLG_Glasses.png");
+                        imgV = new ImageView(img);
+
+                        imgV.setX(player.getTranslateX() + 360);
+                        imgV.setY(player.getTranslateY() + 350);
+                        imgV.setFitWidth(80);
+                        imgV.setFitHeight(50);
+
+                        root.getChildren().add(imgV);
+                    }
+                    if (position == 0) {
+
+                        Image img = new Image("MLG_Glasses2.png");
+                        imgV = new ImageView(img);
+
+                        imgV.setX(player.getTranslateX() + 360);
+                        imgV.setY(player.getTranslateY() + 350);
+                        imgV.setFitWidth(80);
+                        imgV.setFitHeight(50);
+
+                        root.getChildren().add(imgV);
+                    }
+                }
                 break;
             default:
             }
@@ -115,17 +158,61 @@ public class Window extends Application {
 
     private void moveRight() {
         player.setTranslateX(player.getTranslateX() + 40);
-        astronautV.setImage(new Image("BestAstronautRight.png"));
+        position = 1;
+
+        if (root.getChildren().contains(imgV)) {
+            root.getChildren().remove(imgV);
+        }
+
+        if (hasJumped) {
+            astronautV.setImage(new Image("BestAstronautFlyingRight.png"));
+        } else {
+            astronautV.setImage(new Image("BestAstronautRight.png"));
+
+        }
 
     }
 
     private void moveLeft() {
         player.setTranslateX(player.getTranslateX() - 40);
-        astronautV.setImage(new Image("BestAstronautLeft.png"));
+        position = 0;
 
+        if (root.getChildren().contains(imgV)) {
+            root.getChildren().remove(imgV);
+        }
+
+        if (hasJumped) {
+            astronautV.setImage(new Image("BestAstronautFlyingLeft.png"));
+        } else {
+            astronautV.setImage(new Image("BestAstronautLeft.png"));
+
+        }
     }
 
     private void jump() {
+        hasJumped = true;
+        if (root.getChildren().contains(imgV)) {
+            root.getChildren().remove(imgV);
+        }
+        if (position == 1) {
+            astronautV.setImage(new Image("BestAstronautFlyingRight.png"));
+
+        } else if (position == 0) {
+            astronautV.setImage(new Image("BestAstronautFlyingLeft.png"));
+
+        }
+    }
+
+    private void jumpingMechanics() {
+
+        if (hasJumped) {
+
+            player.setTranslateY(player.getTranslateY() - 5);
+        }
+        if (player.getTranslateX() < -1300) {
+            hasJumped = false;
+            player.setTranslateY(player.getTranslateY() + 5);
+        }
 
     }
 }
