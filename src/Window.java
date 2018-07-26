@@ -15,20 +15,25 @@ import javafx.stage.Stage;
 public class Window extends Application {
 
     private Pane root;
-    private List<Node>rightShots = new ArrayList<>();
-    private List<Node>leftShots = new ArrayList<>();
+    private List<Node> rightShots = new ArrayList<>();
+    private List<Node> leftShots = new ArrayList<>();
     private int[][] map;
     private static int tileSize = 32;
     private Node player;
     private ImageView astronautV;
     private AnimationTimer timer;
+
     private Boolean isJumping = false;
     private Boolean isFalling = false;
     private Boolean hasShot = false;
     private Boolean addShot = false;
     private Boolean powershot = false;
     private Boolean decreasePowershot = true;
+    private Boolean enablePowershot = false;
+    private Boolean addLaser = false;
+
     private Rectangle fuelMeasurer;
+    private Node laser = initLaser();
     private Rectangle powershotMeasurer;
     private int position = 1;
     private ImageView imgV;
@@ -105,7 +110,7 @@ public class Window extends Application {
     private Node initPowershotInscription() {
         Image fuel = new Image("powershot.png");
         ImageView fuelV = new ImageView(fuel);
-        
+
         fuelV.setX(805);
         fuelV.setY(4);
         fuelV.setFitWidth(220);
@@ -113,29 +118,29 @@ public class Window extends Application {
 
         return fuelV;
     }
+
     private Node initPowershotBar() {
-        Rectangle fuelBar = new Rectangle(200,33,Color.WHITE);
-        
+        Rectangle fuelBar = new Rectangle(200, 33, Color.WHITE);
+
         fuelBar.setX(1035);
         fuelBar.setY(25);
-        
 
         return fuelBar;
     }
+
     private Rectangle initPowershotMeasurer() {
-        Rectangle fuelMeasurer = new Rectangle(0,17,Color.RED); 
-        
+        Rectangle fuelMeasurer = new Rectangle(0, 17, Color.RED);
+
         fuelMeasurer.setX(1045);
         fuelMeasurer.setY(33);
-        
 
         return fuelMeasurer;
     }
-    
+
     private Node initFuelInscription() {
         Image fuel = new Image("fuelxd.png");
         ImageView fuelV = new ImageView(fuel);
-        
+
         fuelV.setX(35);
         fuelV.setY(17);
         fuelV.setFitWidth(110);
@@ -143,26 +148,25 @@ public class Window extends Application {
 
         return fuelV;
     }
+
     private Node initFuelBar() {
-        Rectangle fuelBar = new Rectangle(200,33,Color.WHITE);
-        
+        Rectangle fuelBar = new Rectangle(200, 33, Color.WHITE);
+
         fuelBar.setX(150);
         fuelBar.setY(25);
-        
 
         return fuelBar;
     }
+
     private Rectangle initFuelMeasurer() {
-        Rectangle fuelMeasurer = new Rectangle(180,17,Color.LIMEGREEN); 
-        
+        Rectangle fuelMeasurer = new Rectangle(180, 17, Color.LIMEGREEN);
+
         fuelMeasurer.setX(160);
         fuelMeasurer.setY(33);
-        
 
         return fuelMeasurer;
     }
-    
-    
+
     private Node initPlayer() {
         Image astronaut = new Image("BestAstronautRight.png");
 
@@ -184,9 +188,10 @@ public class Window extends Application {
         shotV.setFitWidth(60);
         shotV.setFitHeight(40);
         root.getChildren().add(shotV);
-        
+
         return shotV;
     }
+
     private Node initLeftShot() {
         Image shot = new Image("shot.png");
 
@@ -196,7 +201,7 @@ public class Window extends Application {
         shotV.setFitWidth(60);
         shotV.setFitHeight(40);
         root.getChildren().add(shotV);
-        
+
         return shotV;
     }
 
@@ -252,19 +257,19 @@ public class Window extends Application {
                 break;
 
             case SPACE:
-                if(powershotMeasurer.getWidth()!=180) {
-                    powershotMeasurer.setWidth(powershotMeasurer.getWidth()+5);
-                    
+                if (powershotMeasurer.getWidth() != 180) {
+                    powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
+
                 }
-                if(powershotMeasurer.getWidth()>=180) {
+                if (powershotMeasurer.getWidth() >= 180) {
                     powershot = true;
-                    
+
                 }
-                
+
                 shot();
                 break;
             case E:
-                if(powershot) {
+                if (powershot) {
                     laserShot();
                 }
                 break;
@@ -334,7 +339,7 @@ public class Window extends Application {
     private void jumpingMechanics() {
 
         if (isJumping) {
-            fuelMeasurer.setWidth(fuelMeasurer.getWidth()-3);
+            fuelMeasurer.setWidth(fuelMeasurer.getWidth() - 3);
             player.setTranslateY(player.getTranslateY() - 5);
         }
         if (player.getTranslateY() < -300) {
@@ -355,49 +360,80 @@ public class Window extends Application {
 
         }
         if (isFalling) {
-            fuelMeasurer.setWidth(fuelMeasurer.getWidth()+3);
+            fuelMeasurer.setWidth(fuelMeasurer.getWidth() + 3);
             player.setTranslateY(player.getTranslateY() + 5);
         }
 
     }
 
+    private Rectangle initLaser() {
+
+        Rectangle laser = new Rectangle(1000, 10, Color.RED);
+        
+
+        return laser;
+    }
+
     private void shotMechanics() {
         
-        if(decreasePowershot&&powershotMeasurer.getWidth()!=0) {
-            powershotMeasurer.setWidth(powershotMeasurer.getWidth()-5);
+        if (enablePowershot) {
+            if(addLaser) {
+                root.getChildren().add(laser);
+                addLaser = false;
+            }
+                
+            laser.setTranslateY(player.getTranslateY() + 390);
+            if(position == 1) {
+                laser.setTranslateX(player.getTranslateX() + 490);
+            }
+            if(position == 0) {
+                laser.setTranslateX(player.getTranslateX() - 690);
+            }
+            
+            
         }
-        if(powershotMeasurer.getWidth()==0) {
+
+
+
+        if (decreasePowershot && powershotMeasurer.getWidth() != 0) {
+            powershotMeasurer.setWidth(powershotMeasurer.getWidth() - 3);
+        }
+        if (powershotMeasurer.getWidth() == 0) {
             decreasePowershot = false;
+            powershot = false;
+            if(root.getChildren().contains(laser)) {
+                root.getChildren().remove(laser);
+            }
         }
-        
-        if(!rightShots.isEmpty()) {
-            for(Node shot:rightShots) {
-                shot.setTranslateX(shot.getTranslateX()+10);
+
+        if (!rightShots.isEmpty()) {
+            for (Node shot : rightShots) {
+                shot.setTranslateX(shot.getTranslateX() + 10);
 
             }
         }
-        if(!leftShots.isEmpty()) {
-            for(Node shot:leftShots) {
-                shot.setTranslateX(shot.getTranslateX()-10);
+        if (!leftShots.isEmpty()) {
+            for (Node shot : leftShots) {
+                shot.setTranslateX(shot.getTranslateX() - 10);
 
             }
         }
-        
+
         if (hasShot) {
             if (position == 1) {
-                
+
                 if (addShot) {
                     rightShots.add(initRightShot());
                     addShot = false;
                 }
-                
+
             }
-            if (position == 0) {                 
+            if (position == 0) {
                 if (addShot) {
                     leftShots.add(initLeftShot());
                     addShot = false;
                 }
-                
+
             }
         }
     }
@@ -406,7 +442,12 @@ public class Window extends Application {
         hasShot = true;
         addShot = true;
     }
+
     private void laserShot() {
         decreasePowershot = true;
+        enablePowershot = true;
+        addLaser = true;
+
     }
+
 }
