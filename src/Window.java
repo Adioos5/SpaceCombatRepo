@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Node;
@@ -10,6 +13,8 @@ import javafx.stage.Stage;
 public class Window extends Application {
 
     private Pane root;
+    private List<Node>rightShots = new ArrayList<>();
+    private List<Node>leftShots = new ArrayList<>();
     private int[][] map;
     private static int tileSize = 32;
     private Node player;
@@ -17,6 +22,9 @@ public class Window extends Application {
     private AnimationTimer timer;
     private Boolean isJumping = false;
     private Boolean isFalling = false;
+    private Boolean hasShot = false;
+    private Boolean addShot = false;
+    private Node shot;
     private int position = 1;
     private ImageView imgV;
 
@@ -65,15 +73,15 @@ public class Window extends Application {
 
         }
         player = initPlayer();
-
+        
         root.getChildren().add(player);
 
         timer = new AnimationTimer() {
 
             @Override
             public void handle(long a) {
+                shotMechanics();
                 jumpingMechanics();
-
             }
 
         };
@@ -93,6 +101,31 @@ public class Window extends Application {
         astronautV.setFitHeight(200);
 
         return astronautV;
+    }
+
+    private Node initRightShot() {
+        Image shot = new Image("shot.png");
+
+        ImageView shotV = new ImageView(shot);
+        shotV.setX(player.getTranslateX() + 480);
+        shotV.setY(player.getTranslateY() + 365);
+        shotV.setFitWidth(60);
+        shotV.setFitHeight(40);
+        root.getChildren().add(shotV);
+        
+        return shotV;
+    }
+    private Node initLeftShot() {
+        Image shot = new Image("shot.png");
+
+        ImageView shotV = new ImageView(shot);
+        shotV.setX(player.getTranslateX() + 260);
+        shotV.setY(player.getTranslateY() + 365);
+        shotV.setFitWidth(60);
+        shotV.setFitHeight(40);
+        root.getChildren().add(shotV);
+        
+        return shotV;
     }
 
     @Override
@@ -117,7 +150,7 @@ public class Window extends Application {
                 jump();
                 break;
             case W:
-                if (!isJumping && !root.getChildren().contains(imgV)) {
+                if (!isJumping && !isFalling && !root.getChildren().contains(imgV)) {
 
                     if (position == 1) {
 
@@ -144,6 +177,10 @@ public class Window extends Application {
                         root.getChildren().add(imgV);
                     }
                 }
+                break;
+
+            case SPACE:
+                shot();
                 break;
             default:
             }
@@ -194,22 +231,22 @@ public class Window extends Application {
 
         if (!isFalling) {
             isJumping = true;
+        }
 
-            if (root.getChildren().contains(imgV)) {
-                root.getChildren().remove(imgV);
-            }
-            if (position == 1) {
-                astronautV.setImage(new Image("BestAstronautFlyingRight.png"));
+        if (root.getChildren().contains(imgV)) {
+            root.getChildren().remove(imgV);
+        }
+        if (position == 1) {
+            astronautV.setImage(new Image("BestAstronautFlyingRight.png"));
 
-            } else if (position == 0) {
-                astronautV.setImage(new Image("BestAstronautFlyingLeft.png"));
+        } else if (position == 0) {
+            astronautV.setImage(new Image("BestAstronautFlyingLeft.png"));
 
-            }
         }
     }
 
     private void jumpingMechanics() {
-        System.out.println(player.getTranslateY());
+
         if (isJumping) {
 
             player.setTranslateY(player.getTranslateY() - 5);
@@ -235,5 +272,44 @@ public class Window extends Application {
             player.setTranslateY(player.getTranslateY() + 5);
         }
 
+    }
+
+    private void shotMechanics() {
+        
+        if(!rightShots.isEmpty()) {
+            for(Node shot:rightShots) {
+                shot.setTranslateX(shot.getTranslateX()+10);
+
+            }
+        }
+        if(!leftShots.isEmpty()) {
+            for(Node shot:leftShots) {
+                shot.setTranslateX(shot.getTranslateX()-10);
+
+            }
+        }
+        
+        if (hasShot) {
+            if (position == 1) {
+                
+                if (addShot) {
+                    rightShots.add(initRightShot());
+                    addShot = false;
+                }
+                
+            }
+            if (position == 0) {                 
+                if (addShot) {
+                    leftShots.add(initLeftShot());
+                    addShot = false;
+                }
+                
+            }
+        }
+    }
+
+    private void shot() {
+        hasShot = true;
+        addShot = true;
     }
 }
