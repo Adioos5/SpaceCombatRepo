@@ -26,7 +26,10 @@ public class Window extends Application {
     private Boolean isFalling = false;
     private Boolean hasShot = false;
     private Boolean addShot = false;
+    private Boolean powershot = false;
+    private Boolean decreasePowershot = true;
     private Rectangle fuelMeasurer;
+    private Rectangle powershotMeasurer;
     private int position = 1;
     private ImageView imgV;
 
@@ -76,10 +79,14 @@ public class Window extends Application {
         }
         player = initPlayer();
         fuelMeasurer = initFuelMeasurer();
+        powershotMeasurer = initPowershotMeasurer();
         root.getChildren().add(player);
         root.getChildren().add(initFuelInscription());
+        root.getChildren().add(initPowershotInscription());
         root.getChildren().add(initFuelBar());
         root.getChildren().add(fuelMeasurer);
+        root.getChildren().add(initPowershotBar());
+        root.getChildren().add(powershotMeasurer);
         timer = new AnimationTimer() {
 
             @Override
@@ -95,6 +102,36 @@ public class Window extends Application {
         return root;
     }
 
+    private Node initPowershotInscription() {
+        Image fuel = new Image("powershot.png");
+        ImageView fuelV = new ImageView(fuel);
+        
+        fuelV.setX(805);
+        fuelV.setY(4);
+        fuelV.setFitWidth(220);
+        fuelV.setFitHeight(80);
+
+        return fuelV;
+    }
+    private Node initPowershotBar() {
+        Rectangle fuelBar = new Rectangle(200,33,Color.WHITE);
+        
+        fuelBar.setX(1035);
+        fuelBar.setY(25);
+        
+
+        return fuelBar;
+    }
+    private Rectangle initPowershotMeasurer() {
+        Rectangle fuelMeasurer = new Rectangle(0,17,Color.RED); 
+        
+        fuelMeasurer.setX(1045);
+        fuelMeasurer.setY(33);
+        
+
+        return fuelMeasurer;
+    }
+    
     private Node initFuelInscription() {
         Image fuel = new Image("fuelxd.png");
         ImageView fuelV = new ImageView(fuel);
@@ -215,7 +252,21 @@ public class Window extends Application {
                 break;
 
             case SPACE:
+                if(powershotMeasurer.getWidth()!=180) {
+                    powershotMeasurer.setWidth(powershotMeasurer.getWidth()+5);
+                    
+                }
+                if(powershotMeasurer.getWidth()>=180) {
+                    powershot = true;
+                    
+                }
+                
                 shot();
+                break;
+            case E:
+                if(powershot) {
+                    laserShot();
+                }
                 break;
             default:
             }
@@ -312,6 +363,13 @@ public class Window extends Application {
 
     private void shotMechanics() {
         
+        if(decreasePowershot&&powershotMeasurer.getWidth()!=0) {
+            powershotMeasurer.setWidth(powershotMeasurer.getWidth()-5);
+        }
+        if(powershotMeasurer.getWidth()==0) {
+            decreasePowershot = false;
+        }
+        
         if(!rightShots.isEmpty()) {
             for(Node shot:rightShots) {
                 shot.setTranslateX(shot.getTranslateX()+10);
@@ -347,5 +405,8 @@ public class Window extends Application {
     private void shot() {
         hasShot = true;
         addShot = true;
+    }
+    private void laserShot() {
+        decreasePowershot = true;
     }
 }
