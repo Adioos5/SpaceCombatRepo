@@ -8,6 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 public class Window extends Application {
@@ -24,7 +26,7 @@ public class Window extends Application {
     private Boolean isFalling = false;
     private Boolean hasShot = false;
     private Boolean addShot = false;
-    private Node shot;
+    private Rectangle fuelMeasurer;
     private int position = 1;
     private ImageView imgV;
 
@@ -73,9 +75,11 @@ public class Window extends Application {
 
         }
         player = initPlayer();
-        
+        fuelMeasurer = initFuelMeasurer();
         root.getChildren().add(player);
-
+        root.getChildren().add(initFuelInscription());
+        root.getChildren().add(initFuelBar());
+        root.getChildren().add(fuelMeasurer);
         timer = new AnimationTimer() {
 
             @Override
@@ -91,6 +95,37 @@ public class Window extends Application {
         return root;
     }
 
+    private Node initFuelInscription() {
+        Image fuel = new Image("fuelxd.png");
+        ImageView fuelV = new ImageView(fuel);
+        
+        fuelV.setX(35);
+        fuelV.setY(17);
+        fuelV.setFitWidth(110);
+        fuelV.setFitHeight(50);
+
+        return fuelV;
+    }
+    private Node initFuelBar() {
+        Rectangle fuelBar = new Rectangle(200,33,Color.WHITE);
+        
+        fuelBar.setX(150);
+        fuelBar.setY(25);
+        
+
+        return fuelBar;
+    }
+    private Rectangle initFuelMeasurer() {
+        Rectangle fuelMeasurer = new Rectangle(180,17,Color.LIMEGREEN); 
+        
+        fuelMeasurer.setX(160);
+        fuelMeasurer.setY(33);
+        
+
+        return fuelMeasurer;
+    }
+    
+    
     private Node initPlayer() {
         Image astronaut = new Image("BestAstronautRight.png");
 
@@ -248,7 +283,7 @@ public class Window extends Application {
     private void jumpingMechanics() {
 
         if (isJumping) {
-
+            fuelMeasurer.setWidth(fuelMeasurer.getWidth()-3);
             player.setTranslateY(player.getTranslateY() - 5);
         }
         if (player.getTranslateY() < -300) {
@@ -269,6 +304,7 @@ public class Window extends Application {
 
         }
         if (isFalling) {
+            fuelMeasurer.setWidth(fuelMeasurer.getWidth()+3);
             player.setTranslateY(player.getTranslateY() + 5);
         }
 
