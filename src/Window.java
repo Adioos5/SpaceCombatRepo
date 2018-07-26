@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -22,6 +25,8 @@ public class Window extends Application {
     private Node player;
     private ImageView astronautV;
     private AnimationTimer timer;
+    private MediaPlayer shotSound;
+    private MediaPlayer laserSound;
 
     private Boolean isJumping = false;
     private Boolean isFalling = false;
@@ -44,6 +49,20 @@ public class Window extends Application {
 
     public Pane createMenu() {
         TileMapReader m = new TileMapReader();
+
+        String songPath = "A-Ha - Take On Me(8-bit).mp3";
+        Media soundxd = new Media(new File(songPath).toURI().toString());
+        MediaPlayer mediaPlayer1 = new MediaPlayer(soundxd);
+        mediaPlayer1.setOnEndOfMedia(new Runnable() {
+
+            @Override
+            public void run() {
+                mediaPlayer1.play();
+
+            }
+        });
+
+        mediaPlayer1.play();
 
         root = new Pane();
         map = m.readMap();
@@ -257,11 +276,11 @@ public class Window extends Application {
                 break;
 
             case SPACE:
-                if (powershotMeasurer.getWidth() != 180) {
+                if (powershotMeasurer.getWidth() <= 175) {
                     powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
 
                 }
-                if (powershotMeasurer.getWidth() >= 180) {
+                if (powershotMeasurer.getWidth() >= 175) {
                     powershot = true;
 
                 }
@@ -369,39 +388,43 @@ public class Window extends Application {
     private Rectangle initLaser() {
 
         Rectangle laser = new Rectangle(1000, 10, Color.RED);
-        
 
         return laser;
     }
 
     private void shotMechanics() {
-        
+
         if (enablePowershot) {
-            if(addLaser) {
-                root.getChildren().add(laser);
+            if (addLaser) {
                 addLaser = false;
+                try {
+                    root.getChildren().add(laser);
+                } catch (Exception e) {
+                    
+                }
             }
-                
+
             laser.setTranslateY(player.getTranslateY() + 390);
-            if(position == 1) {
+            if (position == 1) {
                 laser.setTranslateX(player.getTranslateX() + 490);
             }
-            if(position == 0) {
+            if (position == 0) {
                 laser.setTranslateX(player.getTranslateX() - 690);
             }
-            
-            
+
         }
-
-
 
         if (decreasePowershot && powershotMeasurer.getWidth() != 0) {
             powershotMeasurer.setWidth(powershotMeasurer.getWidth() - 3);
         }
-        if (powershotMeasurer.getWidth() == 0) {
+        if (powershotMeasurer.getWidth() <= 0) {
+            if (laserSound != null) {
+                laserSound.stop();
+            }
             decreasePowershot = false;
+            enablePowershot = false;
             powershot = false;
-            if(root.getChildren().contains(laser)) {
+            if (root.getChildren().contains(laser)) {
                 root.getChildren().remove(laser);
             }
         }
@@ -439,11 +462,23 @@ public class Window extends Application {
     }
 
     private void shot() {
-        hasShot = true;
-        addShot = true;
+        if (!enablePowershot) {
+
+            Media sound = new Media(new File("Laser gun sound effect.mp3").toURI().toString());
+            shotSound = new MediaPlayer(sound);
+            shotSound.play();
+
+            hasShot = true;
+            addShot = true;
+        }
     }
 
     private void laserShot() {
+        Media sound = new Media(new File("Laser beam.mp3").toURI().toString());
+        laserSound = new MediaPlayer(sound);
+        laserSound.setAutoPlay(true);
+        laserSound.play();
+
         decreasePowershot = true;
         enablePowershot = true;
         addLaser = true;
