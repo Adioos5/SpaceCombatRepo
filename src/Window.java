@@ -29,7 +29,6 @@ public class Window extends Application {
     private ImageView astronautV;
     private AnimationTimer timer;
 
-    private MediaPlayer music;
     private MediaPlayer shotSound;
     private MediaPlayer laserSound;
 
@@ -41,6 +40,7 @@ public class Window extends Application {
     private Boolean decreasePowershot = true;
     private Boolean enablePowershot = false;
     private Boolean addLaser = false;
+    private Boolean isPlayerDead = false;
 
     private Rectangle fuelMeasurer;
     private Node laser = initLaser();
@@ -58,17 +58,20 @@ public class Window extends Application {
         String songPath = "A-Ha - Take On Me(8-bit).mp3";
         Media soundxd = new Media(new File(songPath).toURI().toString());
 
-        music = new MediaPlayer(soundxd);
+        MediaPlayer music = new MediaPlayer(soundxd);
         music.setOnEndOfMedia(new Runnable() {
 
             @Override
             public void run() {
-                music.play();
+                String songPath = "A-Ha - Take On Me(8-bit).mp3";
+                Media soundxd = new Media(new File(songPath).toURI().toString());
 
+                MediaPlayer music = new MediaPlayer(soundxd);
+                music.play();
             }
         });
 
-        // music.play();
+        music.play();
 
         root = new Pane();
         map = m.readMap();
@@ -263,60 +266,72 @@ public class Window extends Application {
         stage.getScene().setOnKeyPressed(event -> {
             switch (event.getCode()) {
             case RIGHT:
-                moveRight();
+                if (!isPlayerDead) {
+                    moveRight();
+
+                }
                 break;
             case LEFT:
-                moveLeft();
-
+                if (!isPlayerDead) {
+                    moveLeft();
+                }
                 break;
             case UP:
-                jump();
+                if (!isPlayerDead) {
+                    jump();
+                }
                 break;
             case W:
-                if (!isJumping && !isFalling && !root.getChildren().contains(imgV)) {
+                if (!isPlayerDead) {
+                    if (!isJumping && !isFalling && !root.getChildren().contains(imgV)) {
 
-                    if (position == 1) {
+                        if (position == 1) {
 
-                        Image img = new Image("MLG_Glasses.png");
-                        imgV = new ImageView(img);
+                            Image img = new Image("MLG_Glasses.png");
+                            imgV = new ImageView(img);
 
-                        imgV.setX(player.getTranslateX() + 360);
-                        imgV.setY(player.getTranslateY() + 350);
-                        imgV.setFitWidth(80);
-                        imgV.setFitHeight(50);
+                            imgV.setX(player.getTranslateX() + 360);
+                            imgV.setY(player.getTranslateY() + 350);
+                            imgV.setFitWidth(80);
+                            imgV.setFitHeight(50);
 
-                        root.getChildren().add(imgV);
-                    }
-                    if (position == 0) {
+                            root.getChildren().add(imgV);
+                        }
+                        if (position == 0) {
 
-                        Image img = new Image("MLG_Glasses2.png");
-                        imgV = new ImageView(img);
+                            Image img = new Image("MLG_Glasses2.png");
+                            imgV = new ImageView(img);
 
-                        imgV.setX(player.getTranslateX() + 360);
-                        imgV.setY(player.getTranslateY() + 350);
-                        imgV.setFitWidth(80);
-                        imgV.setFitHeight(50);
+                            imgV.setX(player.getTranslateX() + 360);
+                            imgV.setY(player.getTranslateY() + 350);
+                            imgV.setFitWidth(80);
+                            imgV.setFitHeight(50);
 
-                        root.getChildren().add(imgV);
+                            root.getChildren().add(imgV);
+                        }
                     }
                 }
                 break;
 
             case SPACE:
-                if (powershotMeasurer.getWidth() <= 175) {
-                    powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
+                if (!isPlayerDead) {
+                    if (powershotMeasurer.getWidth() <= 175) {
+                        powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
 
+                    }
+                    if (powershotMeasurer.getWidth() >= 175) {
+                        powershot = true;
+
+                    }
+
+                    shot();
                 }
-                if (powershotMeasurer.getWidth() >= 175) {
-                    powershot = true;
-
-                }
-
-                shot();
                 break;
             case E:
-                if (powershot) {
-                    laserShot();
+                if (!isPlayerDead) {
+                    if (powershot) {
+                        laserShot();
+                    }
                 }
                 break;
             default:
@@ -420,29 +435,82 @@ public class Window extends Application {
     }
 
     private void onUpdate() {
-        
-        for (Node shot : rightShots) {
-            shot.setTranslateX(shot.getTranslateX() + 10);
-            
-        }   
-        
-        for (Node shot : leftShots) {
-            shot.setTranslateX(shot.getTranslateX() - 10);
-            
-        }
-        for (Node alienL : aliensL) {
-            alienL.setTranslateX(alienL.getTranslateX() + 3);
-            
-        }
-        for (Node alienR : aliensR) {
-            alienR.setTranslateX(alienR.getTranslateX() - 3);
-        }
-        
+        try {
+            for (Node shot : rightShots) {
+                shot.setTranslateX(shot.getTranslateX() + 10);
+                for (int i = 0; i < aliensL.size(); i++) {
+                    if (shot.getBoundsInParent().intersects(aliensL.get(i).getBoundsInParent())) {
+                        root.getChildren().remove(aliensL.get(i));
+                        root.getChildren().remove(shot);
+                        rightShots.remove(shot);
+                        aliensL.remove(aliensL.get(i));
+                    }
+                }
+                for (int i = 0; i < aliensR.size(); i++) {
+                    if (shot.getBoundsInParent().intersects(aliensR.get(i).getBoundsInParent())) {
+                        root.getChildren().remove(aliensR.get(i));
+                        root.getChildren().remove(shot);
+                        rightShots.remove(shot);
+                        aliensR.remove(aliensR.get(i));
 
-        if (Math.random() < 0.004) {
+                    }
+                }
+            }
+
+            for (Node shot : leftShots) {
+                shot.setTranslateX(shot.getTranslateX() - 10);
+                for (int i = 0; i < aliensL.size(); i++) {
+                    if (shot.getBoundsInParent().intersects(aliensL.get(i).getBoundsInParent())) {
+                        root.getChildren().remove(aliensL.get(i));
+                        root.getChildren().remove(shot);
+                        leftShots.remove(shot);
+                        aliensL.remove(aliensL.get(i));
+                    }
+                }
+                for (int i = 0; i < aliensR.size(); i++) {
+                    if (shot.getBoundsInParent().intersects(aliensR.get(i).getBoundsInParent())) {
+                        root.getChildren().remove(aliensR.get(i));
+                        root.getChildren().remove(shot);
+                        leftShots.remove(shot);
+                        aliensR.remove(aliensR.get(i));
+                    }
+                }
+            }
+
+            for (Node alienL : aliensL) {
+                alienL.setTranslateX(alienL.getTranslateX() + 3);
+                if (root.getChildren().contains(laser)) {
+                    if (laser.getBoundsInParent().intersects(alienL.getBoundsInParent())) {
+                        root.getChildren().remove(alienL);
+                        aliensL.remove(alienL);
+                    }
+                }
+
+                if (player.getBoundsInParent().intersects(alienL.getBoundsInParent())) {
+                    root.getChildren().remove(player);
+                    isPlayerDead = true;
+                }
+            }
+            for (Node alienR : aliensR) {
+                alienR.setTranslateX(alienR.getTranslateX() - 3);
+                if (root.getChildren().contains(laser)) {
+                    if (laser.getBoundsInParent().intersects(alienR.getBoundsInParent())) {
+                        root.getChildren().remove(alienR);
+                        aliensR.remove(alienR);
+                    }
+                }
+                if (player.getBoundsInParent().intersects(alienR.getBoundsInParent())) {
+                    root.getChildren().remove(player);
+                    isPlayerDead = true;
+                }
+            }
+        } catch (Exception e) {
+
+        }
+        if (Math.random() < 0.010) {
             aliensL.add(initAlienL());
         }
-        if (Math.random() < 0.004) {
+        if (Math.random() < 0.010) {
             aliensR.add(initAlienR());
         }
     }
@@ -483,10 +551,6 @@ public class Window extends Application {
                 root.getChildren().remove(laser);
             }
         }
-
-        
-            
-        
 
         if (hasShot) {
             if (position == 1) {
