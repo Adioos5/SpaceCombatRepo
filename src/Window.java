@@ -18,6 +18,9 @@ import javafx.stage.Stage;
 public class Window extends Application {
 
     private Pane root;
+
+    private List<Node> aliensL = new ArrayList<>();
+    private List<Node> aliensR = new ArrayList<>();
     private List<Node> rightShots = new ArrayList<>();
     private List<Node> leftShots = new ArrayList<>();
     private int[][] map;
@@ -25,6 +28,8 @@ public class Window extends Application {
     private Node player;
     private ImageView astronautV;
     private AnimationTimer timer;
+
+    private MediaPlayer music;
     private MediaPlayer shotSound;
     private MediaPlayer laserSound;
 
@@ -52,17 +57,18 @@ public class Window extends Application {
 
         String songPath = "A-Ha - Take On Me(8-bit).mp3";
         Media soundxd = new Media(new File(songPath).toURI().toString());
-        MediaPlayer mediaPlayer1 = new MediaPlayer(soundxd);
-        mediaPlayer1.setOnEndOfMedia(new Runnable() {
+
+        music = new MediaPlayer(soundxd);
+        music.setOnEndOfMedia(new Runnable() {
 
             @Override
             public void run() {
-                mediaPlayer1.play();
+                music.play();
 
             }
         });
 
-        mediaPlayer1.play();
+        // music.play();
 
         root = new Pane();
         map = m.readMap();
@@ -115,6 +121,7 @@ public class Window extends Application {
 
             @Override
             public void handle(long a) {
+                onUpdate();
                 shotMechanics();
                 jumpingMechanics();
             }
@@ -124,6 +131,26 @@ public class Window extends Application {
         timer.start();
 
         return root;
+    }
+
+    private Node initAlienL() {
+        Rectangle alien = new Rectangle(50, 185, Color.GREEN);
+        alien.setTranslateX(-50);
+        alien.setTranslateY(330);
+
+        root.getChildren().add(alien);
+
+        return alien;
+    }
+
+    private Node initAlienR() {
+        Rectangle alien = new Rectangle(50, 185, Color.GREEN);
+        alien.setTranslateX(1300);
+        alien.setTranslateY(330);
+
+        root.getChildren().add(alien);
+
+        return alien;
     }
 
     private Node initPowershotInscription() {
@@ -392,6 +419,34 @@ public class Window extends Application {
         return laser;
     }
 
+    private void onUpdate() {
+        
+        for (Node shot : rightShots) {
+            shot.setTranslateX(shot.getTranslateX() + 10);
+            
+        }   
+        
+        for (Node shot : leftShots) {
+            shot.setTranslateX(shot.getTranslateX() - 10);
+            
+        }
+        for (Node alienL : aliensL) {
+            alienL.setTranslateX(alienL.getTranslateX() + 3);
+            
+        }
+        for (Node alienR : aliensR) {
+            alienR.setTranslateX(alienR.getTranslateX() - 3);
+        }
+        
+
+        if (Math.random() < 0.004) {
+            aliensL.add(initAlienL());
+        }
+        if (Math.random() < 0.004) {
+            aliensR.add(initAlienR());
+        }
+    }
+
     private void shotMechanics() {
 
         if (enablePowershot) {
@@ -400,7 +455,7 @@ public class Window extends Application {
                 try {
                     root.getChildren().add(laser);
                 } catch (Exception e) {
-                    
+
                 }
             }
 
@@ -429,18 +484,9 @@ public class Window extends Application {
             }
         }
 
-        if (!rightShots.isEmpty()) {
-            for (Node shot : rightShots) {
-                shot.setTranslateX(shot.getTranslateX() + 10);
-
-            }
-        }
-        if (!leftShots.isEmpty()) {
-            for (Node shot : leftShots) {
-                shot.setTranslateX(shot.getTranslateX() - 10);
-
-            }
-        }
+        
+            
+        
 
         if (hasShot) {
             if (position == 1) {
