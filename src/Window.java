@@ -315,14 +315,6 @@ public class Window extends Application {
 
             case SPACE:
                 if (!isPlayerDead) {
-                    if (powershotMeasurer.getWidth() <= 175) {
-                        powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
-
-                    }
-                    if (powershotMeasurer.getWidth() >= 175) {
-                        powershot = true;
-
-                    }
 
                     shot();
                 }
@@ -444,6 +436,14 @@ public class Window extends Application {
                         root.getChildren().remove(shot);
                         rightShots.remove(shot);
                         aliensL.remove(aliensL.get(i));
+                        if (powershotMeasurer.getWidth() <= 175) {
+                            powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
+
+                        }
+                        if (powershotMeasurer.getWidth() >= 175) {
+                            powershot = true;
+
+                        }
                     }
                 }
                 for (int i = 0; i < aliensR.size(); i++) {
@@ -452,7 +452,14 @@ public class Window extends Application {
                         root.getChildren().remove(shot);
                         rightShots.remove(shot);
                         aliensR.remove(aliensR.get(i));
+                        if (powershotMeasurer.getWidth() <= 175) {
+                            powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
 
+                        }
+                        if (powershotMeasurer.getWidth() >= 175) {
+                            powershot = true;
+
+                        }
                     }
                 }
             }
@@ -465,6 +472,14 @@ public class Window extends Application {
                         root.getChildren().remove(shot);
                         leftShots.remove(shot);
                         aliensL.remove(aliensL.get(i));
+                        if (powershotMeasurer.getWidth() <= 175) {
+                            powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
+
+                        }
+                        if (powershotMeasurer.getWidth() >= 175) {
+                            powershot = true;
+
+                        }
                     }
                 }
                 for (int i = 0; i < aliensR.size(); i++) {
@@ -473,6 +488,14 @@ public class Window extends Application {
                         root.getChildren().remove(shot);
                         leftShots.remove(shot);
                         aliensR.remove(aliensR.get(i));
+                        if (powershotMeasurer.getWidth() <= 175) {
+                            powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
+
+                        }
+                        if (powershotMeasurer.getWidth() >= 175) {
+                            powershot = true;
+
+                        }
                     }
                 }
             }
@@ -507,10 +530,10 @@ public class Window extends Application {
         } catch (Exception e) {
 
         }
-        if (Math.random() < 0.010) {
+        if (Math.random() < 0.020) {
             aliensL.add(initAlienL());
         }
-        if (Math.random() < 0.010) {
+        if (Math.random() < 0.020) {
             aliensR.add(initAlienR());
         }
     }
