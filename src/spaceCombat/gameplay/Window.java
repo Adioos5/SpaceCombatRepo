@@ -1,4 +1,5 @@
 package spaceCombat.gameplay;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +61,7 @@ public class Window extends Application {
 
         MusicPlayer music = new MusicPlayer();
         music.randomMusic();
-        
+
         root = new Pane();
         map = m.readMap();
         for (int i = 0; i < map.length; i++) {
@@ -125,23 +126,29 @@ public class Window extends Application {
     }
 
     private Node initAlienL() {
-        Rectangle alien = new Rectangle(50, 185, Color.GREEN);
-        alien.setTranslateX(-50);
-        alien.setTranslateY(330);
+        Image alien = new Image("images/AlienL.png");
+        ImageView alienV = new ImageView(alien);
+        alienV.setFitHeight(175);
+        alienV.setFitWidth(90);
+        alienV.setTranslateX(-50);
+        alienV.setTranslateY(343);
 
-        root.getChildren().add(alien);
+        root.getChildren().add(alienV);
 
-        return alien;
+        return alienV;
     }
 
     private Node initAlienR() {
-        Rectangle alien = new Rectangle(50, 185, Color.GREEN);
-        alien.setTranslateX(1300);
-        alien.setTranslateY(330);
+        Image alien = new Image("images/AlienR.png");
+        ImageView alienV = new ImageView(alien);
+        alienV.setFitHeight(175);
+        alienV.setFitWidth(90);
+        alienV.setTranslateX(1300);
+        alienV.setTranslateY(343);
 
-        root.getChildren().add(alien);
+        root.getChildren().add(alienV);
 
-        return alien;
+        return alienV;
     }
 
     private Node initPowershotInscription() {
@@ -518,12 +525,14 @@ public class Window extends Application {
         } catch (Exception e) {
 
         }
+
         if (Math.random() < 0.020) {
             aliensL.add(initAlienL());
         }
         if (Math.random() < 0.020) {
             aliensR.add(initAlienR());
         }
+
     }
 
     private void shotMechanics() {

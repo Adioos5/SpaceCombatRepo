@@ -10,7 +10,7 @@ public class MusicPlayer {
 
     public void randomMusic() {
         int number = (int) (Math.random() * 10);
-        System.out.println(number);
+       
         if (number == 1 || number == 2) {
             playMusic("A-Ha - Take On Me(8-bit)");
         }
