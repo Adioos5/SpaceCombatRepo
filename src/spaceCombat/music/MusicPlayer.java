@@ -8,6 +8,8 @@ import javafx.scene.media.MediaPlayer;
 
 public class MusicPlayer {
 
+    private MediaPlayer mediaPlayer;
+    
     public void randomMusic() {
         int number = (int) (Math.random() * 10);
        
@@ -34,7 +36,7 @@ public class MusicPlayer {
 
             String songPath = "music/A-Ha - Take On Me(8-bit).mp3";
             Media sound = new Media(new File(songPath).toURI().toString());
-            MediaPlayer mediaPlayer = new MediaPlayer(sound);
+            mediaPlayer = new MediaPlayer(sound);
             mediaPlayer.setOnEndOfMedia(new Runnable() {
 
                 @Override
@@ -50,7 +52,7 @@ public class MusicPlayer {
 
             String songPath = "music/Toto - Africa(8-bit).mp3";
             Media sound = new Media(new File(songPath).toURI().toString());
-            MediaPlayer mediaPlayer = new MediaPlayer(sound);
+            mediaPlayer = new MediaPlayer(sound);
             mediaPlayer.setOnEndOfMedia(new Runnable() {
 
                 @Override
@@ -66,7 +68,7 @@ public class MusicPlayer {
 
             String songPath = "music/Blue (Da Ba Dee)(8-bit).mp3";
             Media sound = new Media(new File(songPath).toURI().toString());
-            MediaPlayer mediaPlayer = new MediaPlayer(sound);
+            mediaPlayer = new MediaPlayer(sound);
             mediaPlayer.setOnEndOfMedia(new Runnable() {
 
                 @Override
@@ -82,7 +84,7 @@ public class MusicPlayer {
 
             String songPath = "music/Smash Mouth - All star(8-bit).mp3";
             Media sound = new Media(new File(songPath).toURI().toString());
-            MediaPlayer mediaPlayer = new MediaPlayer(sound);
+            mediaPlayer = new MediaPlayer(sound);
             mediaPlayer.setOnEndOfMedia(new Runnable() {
 
                 @Override
@@ -98,7 +100,7 @@ public class MusicPlayer {
 
             String songPath = "music/Daft Punk - Get Lucky(8-bit).mp3";
             Media sound = new Media(new File(songPath).toURI().toString());
-            MediaPlayer mediaPlayer = new MediaPlayer(sound);
+            mediaPlayer = new MediaPlayer(sound);
             mediaPlayer.setOnEndOfMedia(new Runnable() {
 
                 @Override

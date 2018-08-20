@@ -58,7 +58,7 @@ public class Window extends Application {
     private Boolean addLaser = false;
     private Boolean isPlayerDead = false;
     private Boolean menu = true;
-
+    private MediaPlayer mediaPlayer;
     private Rectangle fuelMeasurer;
     private Node laser = initLaser();
     private Rectangle powershotMeasurer;
@@ -89,8 +89,20 @@ public class Window extends Application {
 
             }
         }
-        MusicPlayer music = new MusicPlayer();
-        music.randomMusic();
+        String songPath = "music/Coldplay - Viva La Vida(8-bit).mp3";
+        Media sound = new Media(new File(songPath).toURI().toString());
+        mediaPlayer = new MediaPlayer(sound);
+        mediaPlayer.setOnEndOfMedia(new Runnable(){
+
+            @Override
+            public void run() {
+                mediaPlayer.play();
+                
+            }
+            
+        });
+        mediaPlayer.play();
+
 
         Text gameTitle = new Text("Space Combat™");
         gameTitle.setFont(Font.font("Monospaced", 85));
@@ -104,17 +116,23 @@ public class Window extends Application {
         play.setX(570);
         play.setY(220);
 
-        Text op = new Text("Options");
+        Text sh = new Text("Shop");
+        sh.setFont(Font.font("Monospaced", 50));
+        sh.setFill(Color.WHITE);
+        sh.setX(570);
+        sh.setY(300);
+        
+        Text op = new Text("Help");
         op.setFont(Font.font("Monospaced", 50));
         op.setFill(Color.WHITE);
-        op.setX(530);
-        op.setY(300);
+        op.setX(570);
+        op.setY(380);
 
         Text q = new Text("Quit");
         q.setFont(Font.font("Monospaced", 50));
         q.setFill(Color.WHITE);
         q.setX(570);
-        q.setY(380);
+        q.setY(460);
 
         Image img = new Image("images/mars.png");
         ImageView imgV = new ImageView(img);
@@ -125,8 +143,8 @@ public class Window extends Application {
 
         Image img2 = new Image("images/green planet.png");
         ImageView imgV2 = new ImageView(img2);
-        imgV2.setX(400);
-        imgV2.setY(440);
+        imgV2.setX(350);
+        imgV2.setY(480);
         imgV2.setFitWidth(150);
         imgV2.setFitHeight(150);
 
@@ -153,20 +171,29 @@ public class Window extends Application {
 
         Image r = new Image("images/rocket.png");
         ImageView rv = new ImageView(r);
-        rv.setX(200);
-        rv.setY(250);
+        rv.setX(250);
+        rv.setY(200);
         rv.setFitWidth(150);
         rv.setFitHeight(250);
+        
+        Image u = new Image("images/ufo.png");
+        ImageView uv = new ImageView(u);
+        uv.setX(1000);
+        uv.setY(350);
+        uv.setFitWidth(200);
+        uv.setFitHeight(100);
 
         root.getChildren().add(imgV);
         root.getChildren().add(imgV2);
         root.getChildren().add(imgV3);
         root.getChildren().add(imgV4);
         root.getChildren().add(rv);
+        root.getChildren().add(uv);
         root.getChildren().add(av);
 
         root.getChildren().add(gameTitle);
         root.getChildren().add(play);
+        root.getChildren().add(sh);
         root.getChildren().add(op);
         root.getChildren().add(q);
 
@@ -174,8 +201,13 @@ public class Window extends Application {
     }
 
     public Pane createGame() {
-        TileMapReader m = new TileMapReader(2);
+        mediaPlayer.stop();
 
+        TileMapReader m = new TileMapReader(2);
+        
+        MusicPlayer music = new MusicPlayer();
+        music.randomMusic();
+        
         menu = false;
         root.getChildren().clear();
         int[][] map = m.readMap();
@@ -430,7 +462,7 @@ public class Window extends Application {
                 break;
             case DOWN:
 
-                if (av.getY() != 345) {
+                if (av.getY() != 425) {
                     av.setY(av.getY() + 80);
                 }
                 break;
@@ -491,7 +523,7 @@ public class Window extends Application {
                     if (av.getY() == 185) {
                         createGame();
                     }
-                    if (av.getY() == 345) {
+                    if (av.getY() == 425) {
                         System.exit(0);
                     }
                 }
