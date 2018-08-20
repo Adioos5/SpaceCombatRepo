@@ -29,7 +29,7 @@ public class Window extends Application {
     private List<Node> aliensR = new ArrayList<>();
     private List<Node> rightShots = new ArrayList<>();
     private List<Node> leftShots = new ArrayList<>();
-    private int[][] map;
+
     private static int tileSize = 32;
     private Node player;
     private ImageView astronautV;
@@ -44,7 +44,8 @@ public class Window extends Application {
     private Text laserBeamText;
     private Text time;
     private Text waveTime;
-    
+    private ImageView av;
+
     private Stopwatch stopwatch;
 
     private Boolean isJumping = false;
@@ -56,6 +57,7 @@ public class Window extends Application {
     private Boolean enablePowershot = false;
     private Boolean addLaser = false;
     private Boolean isPlayerDead = false;
+    private Boolean menu = true;
 
     private Rectangle fuelMeasurer;
     private Node laser = initLaser();
@@ -68,13 +70,115 @@ public class Window extends Application {
     }
 
     public Pane createMenu() {
-        TileMapReader m = new TileMapReader();
+        root = new Pane();
+        TileMapReader m = new TileMapReader(1);
+        int[][] map = m.readMap();
 
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < getMapHeight(map); j++) {
+                if (map[i][j] == 0) {
+                    Image img = new Image("images/realSky.png");
+                    ImageView imgV = new ImageView(img);
+                    imgV.setX(i * tileSize);
+                    imgV.setY(j * tileSize);
+                    imgV.setFitWidth(32);
+                    imgV.setFitHeight(32);
+
+                    root.getChildren().add(imgV);
+                }
+
+            }
+        }
         MusicPlayer music = new MusicPlayer();
         music.randomMusic();
 
-        root = new Pane();
-        map = m.readMap();
+        Text gameTitle = new Text("Space Combat™");
+        gameTitle.setFont(Font.font("Monospaced", 85));
+        gameTitle.setFill(Color.WHITE);
+        gameTitle.setX(330);
+        gameTitle.setY(100);
+
+        Text play = new Text("Play");
+        play.setFont(Font.font("Monospaced", 50));
+        play.setFill(Color.WHITE);
+        play.setX(570);
+        play.setY(220);
+
+        Text op = new Text("Options");
+        op.setFont(Font.font("Monospaced", 50));
+        op.setFill(Color.WHITE);
+        op.setX(530);
+        op.setY(300);
+
+        Text q = new Text("Quit");
+        q.setFont(Font.font("Monospaced", 50));
+        q.setFill(Color.WHITE);
+        q.setX(570);
+        q.setY(380);
+
+        Image img = new Image("images/mars.png");
+        ImageView imgV = new ImageView(img);
+        imgV.setX(800);
+        imgV.setY(400);
+        imgV.setFitWidth(200);
+        imgV.setFitHeight(200);
+
+        Image img2 = new Image("images/green planet.png");
+        ImageView imgV2 = new ImageView(img2);
+        imgV2.setX(400);
+        imgV2.setY(440);
+        imgV2.setFitWidth(150);
+        imgV2.setFitHeight(150);
+
+        Image img3 = new Image("images/moon.png");
+        ImageView imgV3 = new ImageView(img3);
+        imgV3.setX(50);
+        imgV3.setY(100);
+        imgV3.setFitWidth(150);
+        imgV3.setFitHeight(150);
+
+        Image img4 = new Image("images/saturn.png");
+        ImageView imgV4 = new ImageView(img4);
+        imgV4.setX(1000);
+        imgV4.setY(200);
+        imgV4.setFitWidth(80);
+        imgV4.setFitHeight(80);
+
+        Image a = new Image("images/arrow.png");
+        av = new ImageView(a);
+        av.setX(450);
+        av.setY(185);
+        av.setFitWidth(50);
+        av.setFitHeight(50);
+
+        Image r = new Image("images/rocket.png");
+        ImageView rv = new ImageView(r);
+        rv.setX(200);
+        rv.setY(250);
+        rv.setFitWidth(150);
+        rv.setFitHeight(250);
+
+        root.getChildren().add(imgV);
+        root.getChildren().add(imgV2);
+        root.getChildren().add(imgV3);
+        root.getChildren().add(imgV4);
+        root.getChildren().add(rv);
+        root.getChildren().add(av);
+
+        root.getChildren().add(gameTitle);
+        root.getChildren().add(play);
+        root.getChildren().add(op);
+        root.getChildren().add(q);
+
+        return root;
+    }
+
+    public Pane createGame() {
+        TileMapReader m = new TileMapReader(2);
+
+        menu = false;
+        root.getChildren().clear();
+        int[][] map = m.readMap();
 
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < getMapHeight(map); j++) {
@@ -120,7 +224,7 @@ public class Window extends Application {
         waveTime.setFill(Color.WHITE);
         waveTime.setX(620);
         waveTime.setY(150);
-        
+
         time = new Text("");
         time.setFont(Font.font("Monospaced", 85));
         time.setFill(Color.WHITE);
@@ -168,15 +272,15 @@ public class Window extends Application {
                         play = true;
                     }
                 }
-                if(stopwatch.isInterrupted()) {
+                if (stopwatch.isInterrupted()) {
                     startWave = true;
-                    if(startWave) {
+                    if (startWave) {
                         thread = new WaveTimer();
                         startWave = false;
                     }
-                    if(thread!= null) {
+                    if (thread != null) {
                         thread.start();
-                        waveTime.setText(""+(30-thread.getSeconds()));
+                        waveTime.setText("" + (30 - thread.getSeconds()));
                     }
                 }
             }
@@ -300,63 +404,95 @@ public class Window extends Application {
         stage.getScene().setOnKeyPressed(event -> {
             switch (event.getCode()) {
             case RIGHT:
-                if (!isPlayerDead) {
-                    moveRight();
+                if (!menu) {
+                    if (!isPlayerDead) {
+                        moveRight();
 
+                    }
                 }
                 break;
             case LEFT:
-                if (!isPlayerDead) {
-                    moveLeft();
+                if (!menu) {
+                    if (!isPlayerDead) {
+                        moveLeft();
+                    }
                 }
                 break;
             case UP:
-                if (!isPlayerDead) {
-                    jump();
+                if (!menu) {
+                    if (!isPlayerDead) {
+                        jump();
+                    }
+                }
+                if (av.getY() != 185) {
+                    av.setY(av.getY() - 80);
+                }
+                break;
+            case DOWN:
+
+                if (av.getY() != 345) {
+                    av.setY(av.getY() + 80);
                 }
                 break;
             case W:
-                if (!isPlayerDead) {
-                    if (!isJumping && !isFalling && !root.getChildren().contains(imgV)) {
+                if (!menu) {
+                    if (!isPlayerDead) {
+                        if (!isJumping && !isFalling && !root.getChildren().contains(imgV)) {
 
-                        if (position == 1) {
+                            if (position == 1) {
 
-                            Image img = new Image("images/MLG_Glasses.png");
-                            imgV = new ImageView(img);
+                                Image img = new Image("images/MLG_Glasses.png");
+                                imgV = new ImageView(img);
 
-                            imgV.setX(player.getTranslateX() + 337);
-                            imgV.setY(player.getTranslateY() + 360);
-                            imgV.setFitWidth(80);
-                            imgV.setFitHeight(50);
+                                imgV.setX(player.getTranslateX() + 337);
+                                imgV.setY(player.getTranslateY() + 360);
+                                imgV.setFitWidth(80);
+                                imgV.setFitHeight(50);
 
-                            root.getChildren().add(imgV);
-                        }
-                        if (position == 0) {
+                                root.getChildren().add(imgV);
+                            }
+                            if (position == 0) {
 
-                            Image img = new Image("images/MLG_Glasses2.png");
-                            imgV = new ImageView(img);
+                                Image img = new Image("images/MLG_Glasses2.png");
+                                imgV = new ImageView(img);
 
-                            imgV.setX(player.getTranslateX() + 350);
-                            imgV.setY(player.getTranslateY() + 360);
-                            imgV.setFitWidth(80);
-                            imgV.setFitHeight(50);
+                                imgV.setX(player.getTranslateX() + 350);
+                                imgV.setY(player.getTranslateY() + 360);
+                                imgV.setFitWidth(80);
+                                imgV.setFitHeight(50);
 
-                            root.getChildren().add(imgV);
+                                root.getChildren().add(imgV);
+                            }
                         }
                     }
                 }
                 break;
 
             case SPACE:
-                if (!isPlayerDead) {
+                if (!menu) {
+                    if (!isPlayerDead) {
 
-                    shot();
+                        shot();
+                    }
                 }
                 break;
             case E:
-                if (!isPlayerDead) {
-                    if (powershot) {
-                        laserShot();
+                if (!menu) {
+                    if (!isPlayerDead) {
+                        if (powershot) {
+                            laserShot();
+                        }
+                    }
+                }
+                break;
+            case ENTER:
+                if (menu) {
+
+                    if (av.getY() == 185) {
+                        createGame();
+                    }
+                    if (av.getY() == 345) {
+                        System.exit(0);
                     }
                 }
                 break;

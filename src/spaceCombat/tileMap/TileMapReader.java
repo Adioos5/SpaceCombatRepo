@@ -1,4 +1,5 @@
 package spaceCombat.tileMap;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -9,7 +10,13 @@ import java.util.List;
 
 public class TileMapReader {
 
-    private static final String MAP_TEXT = "tile_map.txt";
+    private static final String GAME_MAP = "tile_map.txt";
+    private static final String MENU_MAP = "menu.txt";
+    private int type;
+
+    public TileMapReader(int type) {
+        this.type = type;
+    }
 
     public int[][] readMap() {
         List<String> lines = readFile();
@@ -18,7 +25,14 @@ public class TileMapReader {
 
     private List<String> readFile() {
         List<String> lines = new ArrayList<>();
-        URL mapUrl = ClassLoader.getSystemResource(MAP_TEXT);
+        URL mapUrl = null;
+        if (type == 1) {
+            mapUrl = ClassLoader.getSystemResource(MENU_MAP);
+        }
+        if (type == 2) {
+            mapUrl = ClassLoader.getSystemResource(GAME_MAP);
+
+        }
 
         try {
             lines = Files.readAllLines(Paths.get(mapUrl.toURI()));
