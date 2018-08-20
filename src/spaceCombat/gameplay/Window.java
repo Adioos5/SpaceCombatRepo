@@ -15,6 +15,8 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import spaceCombat.music.MusicPlayer;
 import spaceCombat.tileMap.TileMapReader;
@@ -22,7 +24,7 @@ import spaceCombat.tileMap.TileMapReader;
 public class Window extends Application {
 
     private Pane root;
-
+    private Boolean play = false;
     private List<Node> aliensL = new ArrayList<>();
     private List<Node> aliensR = new ArrayList<>();
     private List<Node> rightShots = new ArrayList<>();
@@ -33,8 +35,17 @@ public class Window extends Application {
     private ImageView astronautV;
     private AnimationTimer timer;
 
+    private Boolean startWave = false;
+    private WaveTimer thread;
     private MediaPlayer shotSound;
     private MediaPlayer laserSound;
+
+    private Text fuelText;
+    private Text laserBeamText;
+    private Text time;
+    private Text waveTime;
+    
+    private Stopwatch stopwatch;
 
     private Boolean isJumping = false;
     private Boolean isFalling = false;
@@ -64,6 +75,7 @@ public class Window extends Application {
 
         root = new Pane();
         map = m.readMap();
+
         for (int i = 0; i < map.length; i++) {
             for (int j = 0; j < getMapHeight(map); j++) {
                 if (map[i][j] == 0) {
@@ -102,9 +114,39 @@ public class Window extends Application {
         player = initPlayer();
         fuelMeasurer = initFuelMeasurer();
         powershotMeasurer = initPowershotMeasurer();
+
+        waveTime = new Text("");
+        waveTime.setFont(Font.font("Monospaced", 85));
+        waveTime.setFill(Color.WHITE);
+        waveTime.setX(620);
+        waveTime.setY(150);
+        
+        time = new Text("");
+        time.setFont(Font.font("Monospaced", 85));
+        time.setFill(Color.WHITE);
+        time.setX(620);
+        time.setY(150);
+
+        fuelText = new Text("FUEL");
+        fuelText.setFont(Font.font("Monospaced", 45));
+        fuelText.setFill(Color.WHITE);
+        fuelText.setX(30);
+        fuelText.setY(55);
+
+        laserBeamText = new Text("LASER BEAM");
+        laserBeamText.setFont(Font.font("Monospaced", 45));
+        laserBeamText.setFill(Color.WHITE);
+        laserBeamText.setX(750);
+        laserBeamText.setY(55);
+
+        stopwatch = new Stopwatch();
+        stopwatch.start();
+
+        root.getChildren().add(time);
+        root.getChildren().add(waveTime);
         root.getChildren().add(player);
-        root.getChildren().add(initFuelInscription());
-        root.getChildren().add(initPowershotInscription());
+        root.getChildren().add(fuelText);
+        root.getChildren().add(laserBeamText);
         root.getChildren().add(initFuelBar());
         root.getChildren().add(fuelMeasurer);
         root.getChildren().add(initPowershotBar());
@@ -116,6 +158,27 @@ public class Window extends Application {
                 onUpdate();
                 shotMechanics();
                 jumpingMechanics();
+
+                if (!stopwatch.isInterrupted()) {
+                    time.setText(stopwatch.getMainText().getText());
+                    time.setX(stopwatch.getMainText().getX());
+                    time.setFont(stopwatch.getMainText().getFont());
+
+                    if (stopwatch.getPlay()) {
+                        play = true;
+                    }
+                }
+                if(stopwatch.isInterrupted()) {
+                    startWave = true;
+                    if(startWave) {
+                        thread = new WaveTimer();
+                        startWave = false;
+                    }
+                    if(thread!= null) {
+                        thread.start();
+                        waveTime.setText(""+(30-thread.getSeconds()));
+                    }
+                }
             }
 
         };
@@ -128,10 +191,10 @@ public class Window extends Application {
     private Node initAlienL() {
         Image alien = new Image("images/AlienL.png");
         ImageView alienV = new ImageView(alien);
-        alienV.setFitHeight(175);
-        alienV.setFitWidth(90);
+        alienV.setFitHeight(160);
+        alienV.setFitWidth(80);
         alienV.setTranslateX(-50);
-        alienV.setTranslateY(343);
+        alienV.setTranslateY(355);
 
         root.getChildren().add(alienV);
 
@@ -141,26 +204,14 @@ public class Window extends Application {
     private Node initAlienR() {
         Image alien = new Image("images/AlienR.png");
         ImageView alienV = new ImageView(alien);
-        alienV.setFitHeight(175);
-        alienV.setFitWidth(90);
+        alienV.setFitHeight(160);
+        alienV.setFitWidth(80);
         alienV.setTranslateX(1300);
-        alienV.setTranslateY(343);
+        alienV.setTranslateY(355);
 
         root.getChildren().add(alienV);
 
         return alienV;
-    }
-
-    private Node initPowershotInscription() {
-        Image fuel = new Image("images/powershot.png");
-        ImageView fuelV = new ImageView(fuel);
-
-        fuelV.setX(805);
-        fuelV.setY(4);
-        fuelV.setFitWidth(220);
-        fuelV.setFitHeight(80);
-
-        return fuelV;
     }
 
     private Node initPowershotBar() {
@@ -179,18 +230,6 @@ public class Window extends Application {
         fuelMeasurer.setY(33);
 
         return fuelMeasurer;
-    }
-
-    private Node initFuelInscription() {
-        Image fuel = new Image("images/fuelxd.png");
-        ImageView fuelV = new ImageView(fuel);
-
-        fuelV.setX(35);
-        fuelV.setY(17);
-        fuelV.setFitWidth(110);
-        fuelV.setFitHeight(50);
-
-        return fuelV;
     }
 
     private Node initFuelBar() {
@@ -212,13 +251,13 @@ public class Window extends Application {
     }
 
     private Node initPlayer() {
-        Image astronaut = new Image("images/BestAstronautRight.png");
+        Image astronaut = new Image("images/ar.png");
 
         astronautV = new ImageView(astronaut);
         astronautV.setX(300);
-        astronautV.setY(340);
-        astronautV.setFitWidth(200);
-        astronautV.setFitHeight(200);
+        astronautV.setY(360);
+        astronautV.setFitWidth(170);
+        astronautV.setFitHeight(170);
 
         return astronautV;
     }
@@ -227,10 +266,10 @@ public class Window extends Application {
         Image shot = new Image("images/shot.png");
 
         ImageView shotV = new ImageView(shot);
-        shotV.setX(player.getTranslateX() + 480);
-        shotV.setY(player.getTranslateY() + 365);
-        shotV.setFitWidth(60);
-        shotV.setFitHeight(40);
+        shotV.setX(player.getTranslateX() + 460);
+        shotV.setY(player.getTranslateY() + 394);
+        shotV.setFitWidth(50);
+        shotV.setFitHeight(35);
         root.getChildren().add(shotV);
 
         return shotV;
@@ -241,9 +280,9 @@ public class Window extends Application {
 
         ImageView shotV = new ImageView(shot);
         shotV.setX(player.getTranslateX() + 260);
-        shotV.setY(player.getTranslateY() + 365);
-        shotV.setFitWidth(60);
-        shotV.setFitHeight(40);
+        shotV.setY(player.getTranslateY() + 394);
+        shotV.setFitWidth(50);
+        shotV.setFitHeight(35);
         root.getChildren().add(shotV);
 
         return shotV;
@@ -285,8 +324,8 @@ public class Window extends Application {
                             Image img = new Image("images/MLG_Glasses.png");
                             imgV = new ImageView(img);
 
-                            imgV.setX(player.getTranslateX() + 360);
-                            imgV.setY(player.getTranslateY() + 350);
+                            imgV.setX(player.getTranslateX() + 337);
+                            imgV.setY(player.getTranslateY() + 360);
                             imgV.setFitWidth(80);
                             imgV.setFitHeight(50);
 
@@ -297,8 +336,8 @@ public class Window extends Application {
                             Image img = new Image("images/MLG_Glasses2.png");
                             imgV = new ImageView(img);
 
-                            imgV.setX(player.getTranslateX() + 360);
-                            imgV.setY(player.getTranslateY() + 350);
+                            imgV.setX(player.getTranslateX() + 350);
+                            imgV.setY(player.getTranslateY() + 360);
                             imgV.setFitWidth(80);
                             imgV.setFitHeight(50);
 
@@ -334,7 +373,7 @@ public class Window extends Application {
     }
 
     private void moveRight() {
-        player.setTranslateX(player.getTranslateX() + 40);
+        player.setTranslateX(player.getTranslateX() + 50);
         position = 1;
 
         if (root.getChildren().contains(imgV)) {
@@ -342,16 +381,16 @@ public class Window extends Application {
         }
 
         if (isJumping || isFalling) {
-            astronautV.setImage(new Image("images/BestAstronautFlyingRight.png"));
+            astronautV.setImage(new Image("images/afr.png"));
         } else {
-            astronautV.setImage(new Image("images/BestAstronautRight.png"));
+            astronautV.setImage(new Image("images/ar.png"));
 
         }
 
     }
 
     private void moveLeft() {
-        player.setTranslateX(player.getTranslateX() - 40);
+        player.setTranslateX(player.getTranslateX() - 50);
         position = 0;
 
         if (root.getChildren().contains(imgV)) {
@@ -359,9 +398,9 @@ public class Window extends Application {
         }
 
         if (isJumping || isFalling) {
-            astronautV.setImage(new Image("images/BestAstronautFlyingLeft.png"));
+            astronautV.setImage(new Image("images/afl.png"));
         } else {
-            astronautV.setImage(new Image("images/BestAstronautLeft.png"));
+            astronautV.setImage(new Image("images/al.png"));
 
         }
     }
@@ -376,10 +415,10 @@ public class Window extends Application {
             root.getChildren().remove(imgV);
         }
         if (position == 1) {
-            astronautV.setImage(new Image("images/BestAstronautFlyingRight.png"));
+            astronautV.setImage(new Image("images/afr.png"));
 
         } else if (position == 0) {
-            astronautV.setImage(new Image("images/BestAstronautFlyingLeft.png"));
+            astronautV.setImage(new Image("images/afl.png"));
 
         }
     }
@@ -399,10 +438,10 @@ public class Window extends Application {
             isJumping = false;
 
             if (position == 1) {
-                astronautV.setImage(new Image("images/BestAstronautRight.png"));
+                astronautV.setImage(new Image("images/ar.png"));
 
             } else if (position == 0) {
-                astronautV.setImage(new Image("images/BestAstronautLeft.png"));
+                astronautV.setImage(new Image("images/al.png"));
 
             }
 
@@ -416,7 +455,7 @@ public class Window extends Application {
 
     private Rectangle initLaser() {
 
-        Rectangle laser = new Rectangle(1000, 10, Color.RED);
+        Rectangle laser = new Rectangle(1000, 8, Color.RED);
 
         return laser;
     }
@@ -526,13 +565,18 @@ public class Window extends Application {
 
         }
 
-        if (Math.random() < 0.020) {
-            aliensL.add(initAlienL());
+        if (play) {
+            if (Math.random() < 0.020) {
+                aliensL.add(initAlienL());
+            }
+            if (Math.random() < 0.020) {
+                aliensR.add(initAlienR());
+            }
         }
-        if (Math.random() < 0.020) {
-            aliensR.add(initAlienR());
-        }
+    }
 
+    public void setPlay(Boolean play) {
+        this.play = play;
     }
 
     private void shotMechanics() {
@@ -547,12 +591,12 @@ public class Window extends Application {
                 }
             }
 
-            laser.setTranslateY(player.getTranslateY() + 390);
+            laser.setTranslateY(player.getTranslateY() + 410);
             if (position == 1) {
-                laser.setTranslateX(player.getTranslateX() + 490);
+                laser.setTranslateX(player.getTranslateX() + 470);
             }
             if (position == 0) {
-                laser.setTranslateX(player.getTranslateX() - 690);
+                laser.setTranslateX(player.getTranslateX() - 700);
             }
 
         }
