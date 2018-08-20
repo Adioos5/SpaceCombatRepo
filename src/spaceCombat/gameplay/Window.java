@@ -143,8 +143,8 @@ public class Window extends Application {
 
         Image img2 = new Image("images/green planet.png");
         ImageView imgV2 = new ImageView(img2);
-        imgV2.setX(350);
-        imgV2.setY(480);
+        imgV2.setX(270);
+        imgV2.setY(380);
         imgV2.setFitWidth(150);
         imgV2.setFitHeight(150);
 
@@ -169,26 +169,13 @@ public class Window extends Application {
         av.setFitWidth(50);
         av.setFitHeight(50);
 
-        Image r = new Image("images/rocket.png");
-        ImageView rv = new ImageView(r);
-        rv.setX(250);
-        rv.setY(200);
-        rv.setFitWidth(150);
-        rv.setFitHeight(250);
         
-        Image u = new Image("images/ufo.png");
-        ImageView uv = new ImageView(u);
-        uv.setX(1000);
-        uv.setY(350);
-        uv.setFitWidth(200);
-        uv.setFitHeight(100);
+        
 
         root.getChildren().add(imgV);
         root.getChildren().add(imgV2);
         root.getChildren().add(imgV3);
         root.getChildren().add(imgV4);
-        root.getChildren().add(rv);
-        root.getChildren().add(uv);
         root.getChildren().add(av);
 
         root.getChildren().add(gameTitle);
