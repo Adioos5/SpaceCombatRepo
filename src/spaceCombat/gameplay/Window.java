@@ -25,6 +25,13 @@ public class Window extends Application {
 
     private Pane root;
     private Boolean play = false;
+
+    private Text gameTitle;
+    private Text playt;
+    private Text sh;
+    private Text q;
+    private Text op;
+
     private List<Node> aliensL = new ArrayList<>();
     private List<Node> aliensR = new ArrayList<>();
     private List<Node> rightShots = new ArrayList<>();
@@ -35,6 +42,7 @@ public class Window extends Application {
     private ImageView astronautV;
     private AnimationTimer timer;
 
+    private Boolean choosePlanet = false;
     private MusicPlayer music;
     private Rectangle r;
     private Boolean startWave = true;
@@ -50,6 +58,7 @@ public class Window extends Application {
 
     private Stopwatch stopwatch;
 
+    private ImageView aD;
     private Boolean ufoLeft = true;
     private Boolean ufoRight = false;
 
@@ -110,31 +119,31 @@ public class Window extends Application {
         });
         mediaPlayer.play();
 
-        Text gameTitle = new Text("Space Combat™");
+        gameTitle = new Text("Space Combat™");
         gameTitle.setFont(Font.font("Monospaced", 85));
         gameTitle.setFill(Color.WHITE);
         gameTitle.setX(330);
         gameTitle.setY(100);
 
-        Text play = new Text("Play");
-        play.setFont(Font.font("Monospaced", 50));
-        play.setFill(Color.WHITE);
-        play.setX(570);
-        play.setY(220);
+        playt = new Text("Play");
+        playt.setFont(Font.font("Monospaced", 50));
+        playt.setFill(Color.WHITE);
+        playt.setX(570);
+        playt.setY(220);
 
-        Text sh = new Text("Shop");
+        sh = new Text("Shop");
         sh.setFont(Font.font("Monospaced", 50));
         sh.setFill(Color.WHITE);
         sh.setX(570);
         sh.setY(300);
 
-        Text op = new Text("Help");
+        op = new Text("Help");
         op.setFont(Font.font("Monospaced", 50));
         op.setFill(Color.WHITE);
         op.setX(570);
         op.setY(380);
 
-        Text q = new Text("Quit");
+        q = new Text("Quit");
         q.setFont(Font.font("Monospaced", 50));
         q.setFill(Color.WHITE);
         q.setX(570);
@@ -217,7 +226,7 @@ public class Window extends Application {
         root.getChildren().add(r);
 
         root.getChildren().add(gameTitle);
-        root.getChildren().add(play);
+        root.getChildren().add(playt);
         root.getChildren().add(sh);
         root.getChildren().add(op);
         root.getChildren().add(q);
@@ -226,16 +235,45 @@ public class Window extends Application {
         return root;
     }
 
-    public Pane createGame() {
-        mediaPlayer.stop();
+    public void choosePlanet() {
+        menu = false;
+        choosePlanet = true;
+        
+        root.getChildren().remove(gameTitle);
+        root.getChildren().remove(playt);
+        root.getChildren().remove(q);
+        root.getChildren().remove(op);
+        root.getChildren().remove(sh);
+        root.getChildren().remove(av);
+        root.getChildren().remove(r);
 
+        Text t = new Text("Choose a planet");
+        t.setFont(Font.font("Monospaced", 60));
+        t.setFill(Color.WHITE);
+        t.setX(380);
+        t.setY(100);
+
+        Image img = new Image("images/arrowD.png");
+        aD = new ImageView(img);
+        aD.setX(107);
+        aD.setY(70);
+        aD.setFitWidth(50);
+        aD.setFitHeight(50);
+
+        root.getChildren().add(t);
+        root.getChildren().add(aD);
+    }
+
+    public Pane createGame() {
+        root.getChildren().clear();
+        mediaPlayer.stop();
+        choosePlanet = false;
         TileMapReader m = new TileMapReader(2);
 
         music = new MusicPlayer();
         music.randomMusic();
 
         menu = false;
-        root.getChildren().clear();
         int[][] map = m.readMap();
 
         for (int i = 0; i < map.length; i++) {
@@ -278,10 +316,10 @@ public class Window extends Application {
         powershotMeasurer = initPowershotMeasurer();
 
         waveTime = new Text("");
-        waveTime.setFont(Font.font("Monospaced", 45));
+        waveTime.setFont(Font.font("Monospaced", 55));
         waveTime.setFill(Color.WHITE);
-        waveTime.setX(490);
-        waveTime.setY(57);
+        waveTime.setX(564);
+        waveTime.setY(105);
 
         time = new Text("");
         time.setFont(Font.font("Monospaced", 85));
@@ -467,22 +505,46 @@ public class Window extends Application {
         stage.getScene().setOnKeyPressed(event -> {
             switch (event.getCode()) {
             case RIGHT:
-                if (!menu) {
+                if (!menu&&!choosePlanet) {
                     if (!isPlayerDead) {
                         moveRight();
 
                     }
                 }
+                if (choosePlanet && aD.getX() == 876) {
+                    aD.setX(1015);
+                    aD.setY(160);
+                }
+                if (choosePlanet && aD.getX() == 321) {
+                    aD.setX(876);
+                    aD.setY(360);
+                }
+                if (choosePlanet && aD.getX() == 107) {
+                    aD.setX(321);
+                    aD.setY(350);
+                }
                 break;
             case LEFT:
-                if (!menu) {
+                if (!menu&&!choosePlanet) {
                     if (!isPlayerDead) {
                         moveLeft();
                     }
                 }
+                if (choosePlanet && aD.getX() == 321) {
+                    aD.setX(107);
+                    aD.setY(70);
+                }
+                if (choosePlanet && aD.getX() == 876) {
+                    aD.setX(321);
+                    aD.setY(350);
+                }
+                if (choosePlanet && aD.getX() == 1015) {
+                    aD.setX(876);
+                    aD.setY(360);
+                }
                 break;
             case UP:
-                if (!menu) {
+                if (!menu&&!choosePlanet) {
                     if (!isPlayerDead) {
                         jump();
                     }
@@ -505,7 +567,7 @@ public class Window extends Application {
                 }
                 break;
             case W:
-                if (!menu) {
+                if (!menu&&!choosePlanet) {
                     if (!isPlayerDead) {
                         if (!isJumping && !isFalling && !root.getChildren().contains(imgV)) {
 
@@ -539,7 +601,7 @@ public class Window extends Application {
                 break;
 
             case SPACE:
-                if (!menu) {
+                if (!menu&&!choosePlanet) {
                     if (!isPlayerDead) {
 
                         shot();
@@ -547,7 +609,7 @@ public class Window extends Application {
                 }
                 break;
             case E:
-                if (!menu) {
+                if (!menu&&!choosePlanet) {
                     if (!isPlayerDead) {
                         if (powershot) {
                             laserShot();
@@ -556,15 +618,20 @@ public class Window extends Application {
                 }
                 break;
             case ENTER:
+                if(choosePlanet && aD.getX()==876) {
+                    
+                    createGame();
+                }
                 if (menu) {
 
                     if (av.getY() == 185) {
-                        createGame();
+                        choosePlanet();
                     }
                     if (av.getY() == 425) {
                         System.exit(0);
                     }
                 }
+                
                 break;
             default:
             }
