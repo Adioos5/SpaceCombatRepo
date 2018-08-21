@@ -55,11 +55,12 @@ public class Stopwatch extends Thread {
             Thread.currentThread();
             Thread.sleep(1000);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             System.err.println(e);
         }
         mainText.setText("");
         
-        Thread.currentThread().interrupt();;
+        
     }
 
 }

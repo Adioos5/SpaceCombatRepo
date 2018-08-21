@@ -37,7 +37,7 @@ public class Window extends Application {
 
     private MusicPlayer music;
     private Rectangle r;
-    private Boolean startWave = false;
+    private Boolean startWave = true;
     private WaveTimer thread;
     private MediaPlayer shotSound;
     private MediaPlayer laserSound;
@@ -52,7 +52,7 @@ public class Window extends Application {
 
     private Boolean ufoLeft = true;
     private Boolean ufoRight = false;
-    
+
     private Boolean isJumping = false;
     private Boolean isFalling = false;
     private Boolean hasShot = false;
@@ -71,7 +71,7 @@ public class Window extends Application {
     private ImageView imgV;
 
     private AnimationTimer menuTimer;
-    
+
     public void run() {
         launch(Window.class);
     }
@@ -99,17 +99,16 @@ public class Window extends Application {
         String songPath = "music/Coldplay - Viva La Vida(8-bit).mp3";
         Media sound = new Media(new File(songPath).toURI().toString());
         mediaPlayer = new MediaPlayer(sound);
-        mediaPlayer.setOnEndOfMedia(new Runnable(){
+        mediaPlayer.setOnEndOfMedia(new Runnable() {
 
             @Override
             public void run() {
                 mediaPlayer.play();
-                
+
             }
-            
+
         });
         mediaPlayer.play();
-
 
         Text gameTitle = new Text("Space Combat™");
         gameTitle.setFont(Font.font("Monospaced", 85));
@@ -128,7 +127,7 @@ public class Window extends Application {
         sh.setFill(Color.WHITE);
         sh.setX(570);
         sh.setY(300);
-        
+
         Text op = new Text("Help");
         op.setFont(Font.font("Monospaced", 50));
         op.setFill(Color.WHITE);
@@ -175,7 +174,7 @@ public class Window extends Application {
         av.setY(185);
         av.setFitWidth(50);
         av.setFitHeight(50);
-        
+
         Image u = new Image("images/ufo.png");
         uv = new ImageView(u);
         uv.setX(1301);
@@ -183,32 +182,32 @@ public class Window extends Application {
         uv.setFitWidth(180);
         uv.setFitHeight(90);
 
-        r = new Rectangle(150,5,Color.WHITE);
+        r = new Rectangle(150, 5, Color.WHITE);
         r.setTranslateX(555);
         r.setTranslateY(235);
-        
+
         menuTimer = new AnimationTimer() {
 
             @Override
             public void handle(long l) {
-                if(uv.getX()>1400) {
+                if (uv.getX() > 1400) {
                     ufoLeft = true;
                     ufoRight = false;
                 }
-                if(uv.getX()<-300) {
+                if (uv.getX() < -300) {
                     ufoLeft = false;
                     ufoRight = true;
                 }
-                if(ufoLeft) {
-                    uv.setX(uv.getX()-5);
+                if (ufoLeft) {
+                    uv.setX(uv.getX() - 5);
                 }
-                if(ufoRight) {
-                    uv.setX(uv.getX()+5);
+                if (ufoRight) {
+                    uv.setX(uv.getX() + 5);
                 }
             }
-            
+
         };
-        
+
         root.getChildren().add(imgV);
         root.getChildren().add(imgV2);
         root.getChildren().add(imgV3);
@@ -231,10 +230,10 @@ public class Window extends Application {
         mediaPlayer.stop();
 
         TileMapReader m = new TileMapReader(2);
-        
+
         music = new MusicPlayer();
         music.randomMusic();
-        
+
         menu = false;
         root.getChildren().clear();
         int[][] map = m.readMap();
@@ -279,10 +278,10 @@ public class Window extends Application {
         powershotMeasurer = initPowershotMeasurer();
 
         waveTime = new Text("");
-        waveTime.setFont(Font.font("Monospaced", 85));
+        waveTime.setFont(Font.font("Monospaced", 45));
         waveTime.setFill(Color.WHITE);
-        waveTime.setX(620);
-        waveTime.setY(150);
+        waveTime.setX(490);
+        waveTime.setY(57);
 
         time = new Text("");
         time.setFont(Font.font("Monospaced", 85));
@@ -314,6 +313,9 @@ public class Window extends Application {
         root.getChildren().add(fuelMeasurer);
         root.getChildren().add(initPowershotBar());
         root.getChildren().add(powershotMeasurer);
+
+        thread = new WaveTimer();
+
         timer = new AnimationTimer() {
 
             @Override
@@ -329,21 +331,23 @@ public class Window extends Application {
 
                     if (stopwatch.getPlay()) {
                         play = true;
+
                     }
                 }
-                if (stopwatch.isInterrupted()) {
-                    startWave = true;
+                if (!stopwatch.isAlive()) {
                     if (startWave) {
-                        thread = new WaveTimer();
+                        thread.start();
                         startWave = false;
                     }
-                    if (thread != null) {
-                        thread.start();
-                        waveTime.setText("" + (30 - thread.getSeconds()));
+                    if (thread.getSeconds() > 20) {
+                        waveTime.setText("00:0" + (30 - thread.getSeconds()));
+                    } else {
+                        waveTime.setText("00:" + (30 - thread.getSeconds()));
+
                     }
                 }
-            }
 
+            }
         };
 
         timer.start();
@@ -485,10 +489,10 @@ public class Window extends Application {
                 }
                 if (av.getY() != 185) {
                     av.setY(av.getY() - 80);
-                    
+
                 }
-                if(r.getTranslateY()!=235) {
-                    r.setTranslateY(r.getTranslateY()-80);
+                if (r.getTranslateY() != 235) {
+                    r.setTranslateY(r.getTranslateY() - 80);
                 }
                 break;
             case DOWN:
@@ -496,8 +500,8 @@ public class Window extends Application {
                 if (av.getY() != 425) {
                     av.setY(av.getY() + 80);
                 }
-                if(r.getTranslateY()!=475) {
-                    r.setTranslateY(r.getTranslateY()+80);
+                if (r.getTranslateY() != 475) {
+                    r.setTranslateY(r.getTranslateY() + 80);
                 }
                 break;
             case W:
