@@ -23,7 +23,7 @@ public class MusicPlayer {
             playMusic("Blue (Da Ba Dee)(8-bit)");
         }
         if (number == 7 || number == 8) {
-            playMusic("Smash Mouth - All star(8-bit)");
+            playMusic("Mike Posner - I Took A Pill In Ibiza(8-bit)");
         }
         if (number == 9 || number == 0) {
             playMusic("Daft Punk - Get Lucky(8-bit)");
@@ -80,9 +80,9 @@ public class MusicPlayer {
 
             mediaPlayer.play();
         }
-        if (songTitle.equals("Smash Mouth - All star(8-bit)")) {
+        if (songTitle.equals("Mike Posner - I Took A Pill In Ibiza(8-bit)")) {
 
-            String songPath = "music/Smash Mouth - All star(8-bit).mp3";
+            String songPath = "music/Mike Posner - I Took A Pill In Ibiza(8-bit).mp3";
             Media sound = new Media(new File(songPath).toURI().toString());
             mediaPlayer = new MediaPlayer(sound);
             mediaPlayer.setOnEndOfMedia(new Runnable() {
