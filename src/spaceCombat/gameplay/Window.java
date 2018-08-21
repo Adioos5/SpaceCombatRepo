@@ -35,11 +35,13 @@ public class Window extends Application {
     private ImageView astronautV;
     private AnimationTimer timer;
 
+    private MusicPlayer music;
+    private Rectangle r;
     private Boolean startWave = false;
     private WaveTimer thread;
     private MediaPlayer shotSound;
     private MediaPlayer laserSound;
-
+    private ImageView uv;
     private Text fuelText;
     private Text laserBeamText;
     private Text time;
@@ -48,6 +50,9 @@ public class Window extends Application {
 
     private Stopwatch stopwatch;
 
+    private Boolean ufoLeft = true;
+    private Boolean ufoRight = false;
+    
     private Boolean isJumping = false;
     private Boolean isFalling = false;
     private Boolean hasShot = false;
@@ -65,6 +70,8 @@ public class Window extends Application {
     private int position = 1;
     private ImageView imgV;
 
+    private AnimationTimer menuTimer;
+    
     public void run() {
         launch(Window.class);
     }
@@ -168,15 +175,47 @@ public class Window extends Application {
         av.setY(185);
         av.setFitWidth(50);
         av.setFitHeight(50);
-
         
-        
+        Image u = new Image("images/ufo.png");
+        uv = new ImageView(u);
+        uv.setX(1301);
+        uv.setY(500);
+        uv.setFitWidth(180);
+        uv.setFitHeight(90);
 
+        r = new Rectangle(150,5,Color.WHITE);
+        r.setTranslateX(555);
+        r.setTranslateY(235);
+        
+        menuTimer = new AnimationTimer() {
+
+            @Override
+            public void handle(long l) {
+                if(uv.getX()>1400) {
+                    ufoLeft = true;
+                    ufoRight = false;
+                }
+                if(uv.getX()<-300) {
+                    ufoLeft = false;
+                    ufoRight = true;
+                }
+                if(ufoLeft) {
+                    uv.setX(uv.getX()-5);
+                }
+                if(ufoRight) {
+                    uv.setX(uv.getX()+5);
+                }
+            }
+            
+        };
+        
         root.getChildren().add(imgV);
         root.getChildren().add(imgV2);
         root.getChildren().add(imgV3);
         root.getChildren().add(imgV4);
         root.getChildren().add(av);
+        root.getChildren().add(uv);
+        root.getChildren().add(r);
 
         root.getChildren().add(gameTitle);
         root.getChildren().add(play);
@@ -184,6 +223,7 @@ public class Window extends Application {
         root.getChildren().add(op);
         root.getChildren().add(q);
 
+        menuTimer.start();
         return root;
     }
 
@@ -192,7 +232,7 @@ public class Window extends Application {
 
         TileMapReader m = new TileMapReader(2);
         
-        MusicPlayer music = new MusicPlayer();
+        music = new MusicPlayer();
         music.randomMusic();
         
         menu = false;
@@ -445,12 +485,19 @@ public class Window extends Application {
                 }
                 if (av.getY() != 185) {
                     av.setY(av.getY() - 80);
+                    
+                }
+                if(r.getTranslateY()!=235) {
+                    r.setTranslateY(r.getTranslateY()-80);
                 }
                 break;
             case DOWN:
 
                 if (av.getY() != 425) {
                     av.setY(av.getY() + 80);
+                }
+                if(r.getTranslateY()!=475) {
+                    r.setTranslateY(r.getTranslateY()+80);
                 }
                 break;
             case W:
