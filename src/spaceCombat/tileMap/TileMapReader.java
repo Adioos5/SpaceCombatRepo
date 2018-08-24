@@ -1,16 +1,19 @@
 package spaceCombat.tileMap;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TileMapReader {
 
-    private static final String GAME_MAP = "tile_map.txt";
+    private static final String MARS_MAP = "tile_map.txt";
+    private static final String MOON_MAP = "moon.txt";
     private static final String MENU_MAP = "menu.txt";
     private int type;
 
@@ -25,22 +28,22 @@ public class TileMapReader {
 
     private List<String> readFile() {
         List<String> lines = new ArrayList<>();
-        URL mapUrl = null;
+        InputStream mapUrl = null;
         if (type == 1) {
-            mapUrl = ClassLoader.getSystemResource(MENU_MAP);
+            mapUrl = ClassLoader.getSystemResourceAsStream(MENU_MAP);
         }
         if (type == 2) {
-            mapUrl = ClassLoader.getSystemResource(GAME_MAP);
+            mapUrl = ClassLoader.getSystemResourceAsStream(MARS_MAP);
+
+        }
+        
+        if (type == 3) {
+            mapUrl = ClassLoader.getSystemResourceAsStream(MOON_MAP);
 
         }
 
-        try {
-            lines = Files.readAllLines(Paths.get(mapUrl.toURI()));
-        } catch (IOException e) {
-            System.err.println(e);
-        } catch (URISyntaxException e) {
-            System.err.println(e);
-        }
+        lines =  new BufferedReader(new InputStreamReader(mapUrl,
+                StandardCharsets.UTF_8)).lines().collect(Collectors.toList());
 
         return lines;
     }

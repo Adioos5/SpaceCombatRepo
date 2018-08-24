@@ -3,7 +3,7 @@ package spaceCombat.gameplay;
 public class WaveTimer extends Thread{
 
     private int seconds = 0;
-    
+    private Boolean killAliens = false;
     public int getSeconds() {
         return seconds;
     }
@@ -24,6 +24,11 @@ public class WaveTimer extends Thread{
             seconds++;
             
         }
+        killAliens = true;
+    }
+
+    public Boolean getKillAliens() {
+        return killAliens;
     }
     
 }

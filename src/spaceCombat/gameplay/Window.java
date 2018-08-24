@@ -1,6 +1,6 @@
 package spaceCombat.gameplay;
 
-import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,44 +24,13 @@ import spaceCombat.tileMap.TileMapReader;
 public class Window extends Application {
 
     private Pane root;
+
     private Boolean play = false;
-
-    private Text gameTitle;
-    private Text playt;
-    private Text sh;
-    private Text q;
-    private Text op;
-
-    private List<Node> aliensL = new ArrayList<>();
-    private List<Node> aliensR = new ArrayList<>();
-    private List<Node> rightShots = new ArrayList<>();
-    private List<Node> leftShots = new ArrayList<>();
-
-    private static int tileSize = 32;
-    private Node player;
-    private ImageView astronautV;
-    private AnimationTimer timer;
-
+    private Boolean smth = true;
     private Boolean choosePlanet = false;
-    private MusicPlayer music;
-    private Rectangle r;
     private Boolean startWave = true;
-    private WaveTimer thread;
-    private MediaPlayer shotSound;
-    private MediaPlayer laserSound;
-    private ImageView uv;
-    private Text fuelText;
-    private Text laserBeamText;
-    private Text time;
-    private Text waveTime;
-    private ImageView av;
-
-    private Stopwatch stopwatch;
-
-    private ImageView aD;
     private Boolean ufoLeft = true;
     private Boolean ufoRight = false;
-
     private Boolean isJumping = false;
     private Boolean isFalling = false;
     private Boolean hasShot = false;
@@ -72,14 +41,56 @@ public class Window extends Application {
     private Boolean addLaser = false;
     private Boolean isPlayerDead = false;
     private Boolean menu = true;
-    private MediaPlayer mediaPlayer;
-    private Rectangle fuelMeasurer;
-    private Node laser = initLaser();
-    private Rectangle powershotMeasurer;
+    private Boolean end = false;
+
+    private Text txt;
+    private Text gameTitle;
+    private Text playt;
+    private Text sh;
+    private Text q;
+    private Text op;
+    private Text fuelText;
+    private Text laserBeamText;
+    private Text time;
+    private Text waveTime;
+
+    private List<Node> aliensL = new ArrayList<>();
+    private List<Node> aliensR = new ArrayList<>();
+    private List<Node> rightShots = new ArrayList<>();
+    private List<Node> leftShots = new ArrayList<>();
+
     private int position = 1;
+    private int wave = 1;
+    private static int tileSize = 32;
+    private double aliensRandomness = 0.015;
+    private double aliensSpeed = 2;
+
+    private Node player;
+    private Node laser = initLaser();
+
+    private AnimationTimer timer;
+    private AnimationTimer menuTimer;
+
+    private ImageView astronautV;
+    private ImageView uv;
+    private ImageView av;
+    private ImageView aD;
     private ImageView imgV;
 
-    private AnimationTimer menuTimer;
+    private WaveTimer waveTimer;
+    private Stopwatch stopwatch;
+
+    private Rectangle fuelMeasurer;
+    private Rectangle powershotMeasurer;
+    private Node fuelBar;
+    private Node laserBar;
+    private Rectangle r;
+
+    private MusicPlayer music;
+    private MediaPlayer shotSound;
+    private MediaPlayer laserSound;
+    private MediaPlayer mediaPlayer;
+    private MediaPlayer gameOverSound;
 
     public void run() {
         launch(Window.class);
@@ -105,8 +116,8 @@ public class Window extends Application {
 
             }
         }
-        String songPath = "music/Coldplay - Viva La Vida(8-bit).mp3";
-        Media sound = new Media(new File(songPath).toURI().toString());
+        final URL songPath = getClass().getResource("/music/Coldplay - Viva La Vida(8-bit).mp3");
+        Media sound = new Media(songPath.toString());
         mediaPlayer = new MediaPlayer(sound);
         mediaPlayer.setOnEndOfMedia(new Runnable() {
 
@@ -238,7 +249,7 @@ public class Window extends Application {
     public void choosePlanet() {
         menu = false;
         choosePlanet = true;
-        
+
         root.getChildren().remove(gameTitle);
         root.getChildren().remove(playt);
         root.getChildren().remove(q);
@@ -264,52 +275,95 @@ public class Window extends Application {
         root.getChildren().add(aD);
     }
 
-    public Pane createGame() {
+    public Pane createGame(int planet) {
         root.getChildren().clear();
         mediaPlayer.stop();
         choosePlanet = false;
-        TileMapReader m = new TileMapReader(2);
 
         music = new MusicPlayer();
         music.randomMusic();
 
         menu = false;
-        int[][] map = m.readMap();
 
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < getMapHeight(map); j++) {
-                if (map[i][j] == 0) {
-                    Image img = new Image("images/realSky.png");
-                    ImageView imgV = new ImageView(img);
-                    imgV.setX(i * tileSize);
-                    imgV.setY(j * tileSize);
-                    imgV.setFitWidth(32);
-                    imgV.setFitHeight(32);
+        if (planet == 2) {
+            TileMapReader m = new TileMapReader(2);
+            int[][] map = m.readMap();
 
-                    root.getChildren().add(imgV);
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < getMapHeight(map); j++) {
+                    if (map[i][j] == 0) {
+                        Image img = new Image("images/realSky.png");
+                        ImageView imgV = new ImageView(img);
+                        imgV.setX(i * tileSize);
+                        imgV.setY(j * tileSize);
+                        imgV.setFitWidth(32);
+                        imgV.setFitHeight(32);
+
+                        root.getChildren().add(imgV);
+                    }
+                    if (map[i][j] == 1) {
+                        Image img = new Image("images/Mars ground.png");
+                        ImageView imgV = new ImageView(img);
+                        imgV.setX(i * tileSize);
+                        imgV.setY(j * tileSize);
+                        imgV.setFitWidth(32);
+                        imgV.setFitHeight(32);
+
+                        root.getChildren().add(imgV);
+                    }
+                    if (map[i][j] == 2) {
+                        Image img = new Image("images/Mars upper ground.png");
+                        ImageView imgV = new ImageView(img);
+                        imgV.setX(i * tileSize);
+                        imgV.setY(j * tileSize);
+                        imgV.setFitWidth(32);
+                        imgV.setFitHeight(32);
+
+                        root.getChildren().add(imgV);
+                    }
                 }
-                if (map[i][j] == 1) {
-                    Image img = new Image("images/Mars ground.png");
-                    ImageView imgV = new ImageView(img);
-                    imgV.setX(i * tileSize);
-                    imgV.setY(j * tileSize);
-                    imgV.setFitWidth(32);
-                    imgV.setFitHeight(32);
 
-                    root.getChildren().add(imgV);
-                }
-                if (map[i][j] == 2) {
-                    Image img = new Image("images/Mars upper ground.png");
-                    ImageView imgV = new ImageView(img);
-                    imgV.setX(i * tileSize);
-                    imgV.setY(j * tileSize);
-                    imgV.setFitWidth(32);
-                    imgV.setFitHeight(32);
-
-                    root.getChildren().add(imgV);
-                }
             }
+        }
+        if (planet == 3) {
+            TileMapReader m = new TileMapReader(3);
+            int[][] map = m.readMap();
 
+            for (int i = 0; i < map.length; i++) {
+                for (int j = 0; j < getMapHeight(map); j++) {
+                    if (map[i][j] == 0) {
+                        Image img = new Image("images/realSky.png");
+                        ImageView imgV = new ImageView(img);
+                        imgV.setX(i * tileSize);
+                        imgV.setY(j * tileSize);
+                        imgV.setFitWidth(32);
+                        imgV.setFitHeight(32);
+
+                        root.getChildren().add(imgV);
+                    }
+                    if (map[i][j] == 1) {
+                        Image img = new Image("images/moongr.png");
+                        ImageView imgV = new ImageView(img);
+                        imgV.setX(i * tileSize);
+                        imgV.setY(j * tileSize);
+                        imgV.setFitWidth(32);
+                        imgV.setFitHeight(32);
+
+                        root.getChildren().add(imgV);
+                    }
+                    if (map[i][j] == 2) {
+                        Image img = new Image("images/moonugr.png");
+                        ImageView imgV = new ImageView(img);
+                        imgV.setX(i * tileSize);
+                        imgV.setY(j * tileSize);
+                        imgV.setFitWidth(32);
+                        imgV.setFitHeight(32);
+
+                        root.getChildren().add(imgV);
+                    }
+                }
+
+            }
         }
         player = initPlayer();
         fuelMeasurer = initFuelMeasurer();
@@ -339,7 +393,10 @@ public class Window extends Application {
         laserBeamText.setX(750);
         laserBeamText.setY(55);
 
-        stopwatch = new Stopwatch();
+        laserBar = initPowershotBar();
+        fuelBar = initFuelBar();
+
+        stopwatch = new Stopwatch(wave);
         stopwatch.start();
 
         root.getChildren().add(time);
@@ -347,12 +404,12 @@ public class Window extends Application {
         root.getChildren().add(player);
         root.getChildren().add(fuelText);
         root.getChildren().add(laserBeamText);
-        root.getChildren().add(initFuelBar());
+        root.getChildren().add(fuelBar);
         root.getChildren().add(fuelMeasurer);
-        root.getChildren().add(initPowershotBar());
+        root.getChildren().add(laserBar);
         root.getChildren().add(powershotMeasurer);
 
-        thread = new WaveTimer();
+        waveTimer = new WaveTimer();
 
         timer = new AnimationTimer() {
 
@@ -367,22 +424,37 @@ public class Window extends Application {
                     time.setX(stopwatch.getMainText().getX());
                     time.setFont(stopwatch.getMainText().getFont());
 
-                    if (stopwatch.getPlay()) {
-                        play = true;
-
-                    }
+                    play = stopwatch.getPlay();
                 }
                 if (!stopwatch.isAlive()) {
                     if (startWave) {
-                        thread.start();
+
+                        aliensSpeed += 0.6;
+                        wave += 1;
+                        aliensRandomness += 0.005;
+
+                        waveTimer = new WaveTimer();
+                        waveTimer.start();
+
                         startWave = false;
                     }
-                    if (thread.getSeconds() > 20) {
-                        waveTime.setText("00:0" + (30 - thread.getSeconds()));
+                    if (waveTimer.getSeconds() > 20) {
+                        waveTime.setText("00:0" + (30 - waveTimer.getSeconds()));
                     } else {
-                        waveTime.setText("00:" + (30 - thread.getSeconds()));
+                        waveTime.setText("00:" + (30 - waveTimer.getSeconds()));
 
                     }
+                }
+                if (waveTimer.getSeconds() == 30) {
+
+                    stopwatch.setPlay(false);
+                    startWave = true;
+                    stopwatch = new Stopwatch(wave);
+                    stopwatch.start();
+
+                    waveTimer.stop();
+                    waveTime.setText("");
+                    waveTimer.setSeconds(0);
                 }
 
             }
@@ -505,7 +577,7 @@ public class Window extends Application {
         stage.getScene().setOnKeyPressed(event -> {
             switch (event.getCode()) {
             case RIGHT:
-                if (!menu&&!choosePlanet) {
+                if (!menu && !choosePlanet) {
                     if (!isPlayerDead) {
                         moveRight();
 
@@ -525,7 +597,7 @@ public class Window extends Application {
                 }
                 break;
             case LEFT:
-                if (!menu&&!choosePlanet) {
+                if (!menu && !choosePlanet) {
                     if (!isPlayerDead) {
                         moveLeft();
                     }
@@ -544,7 +616,7 @@ public class Window extends Application {
                 }
                 break;
             case UP:
-                if (!menu&&!choosePlanet) {
+                if (!menu && !choosePlanet) {
                     if (!isPlayerDead) {
                         jump();
                     }
@@ -567,7 +639,7 @@ public class Window extends Application {
                 }
                 break;
             case W:
-                if (!menu&&!choosePlanet) {
+                if (!menu && !choosePlanet) {
                     if (!isPlayerDead) {
                         if (!isJumping && !isFalling && !root.getChildren().contains(imgV)) {
 
@@ -601,7 +673,7 @@ public class Window extends Application {
                 break;
 
             case SPACE:
-                if (!menu&&!choosePlanet) {
+                if (!menu && !choosePlanet) {
                     if (!isPlayerDead) {
 
                         shot();
@@ -609,7 +681,7 @@ public class Window extends Application {
                 }
                 break;
             case E:
-                if (!menu&&!choosePlanet) {
+                if (!menu && !choosePlanet) {
                     if (!isPlayerDead) {
                         if (powershot) {
                             laserShot();
@@ -618,9 +690,13 @@ public class Window extends Application {
                 }
                 break;
             case ENTER:
-                if(choosePlanet && aD.getX()==876) {
-                    
-                    createGame();
+                if (choosePlanet && aD.getX() == 876) {
+
+                    createGame(2);
+                }
+                if (choosePlanet && aD.getX() == 107) {
+
+                    createGame(3);
                 }
                 if (menu) {
 
@@ -631,7 +707,7 @@ public class Window extends Application {
                         System.exit(0);
                     }
                 }
-                
+
                 break;
             default:
             }
@@ -751,6 +827,7 @@ public class Window extends Application {
                             powershot = true;
 
                         }
+
                     }
                 }
                 for (int i = 0; i < aliensR.size(); i++) {
@@ -767,6 +844,7 @@ public class Window extends Application {
                             powershot = true;
 
                         }
+
                     }
                 }
             }
@@ -787,6 +865,7 @@ public class Window extends Application {
                             powershot = true;
 
                         }
+
                     }
                 }
                 for (int i = 0; i < aliensR.size(); i++) {
@@ -803,16 +882,19 @@ public class Window extends Application {
                             powershot = true;
 
                         }
+
                     }
+
                 }
             }
 
             for (Node alienL : aliensL) {
-                alienL.setTranslateX(alienL.getTranslateX() + 3);
+                alienL.setTranslateX(alienL.getTranslateX() + aliensSpeed);
                 if (root.getChildren().contains(laser)) {
                     if (laser.getBoundsInParent().intersects(alienL.getBoundsInParent())) {
                         root.getChildren().remove(alienL);
                         aliensL.remove(alienL);
+
                     }
                 }
 
@@ -820,31 +902,42 @@ public class Window extends Application {
                     root.getChildren().remove(player);
                     isPlayerDead = true;
                 }
+
             }
             for (Node alienR : aliensR) {
-                alienR.setTranslateX(alienR.getTranslateX() - 3);
+                alienR.setTranslateX(alienR.getTranslateX() - aliensSpeed);
                 if (root.getChildren().contains(laser)) {
                     if (laser.getBoundsInParent().intersects(alienR.getBoundsInParent())) {
                         root.getChildren().remove(alienR);
                         aliensR.remove(alienR);
+
                     }
                 }
                 if (player.getBoundsInParent().intersects(alienR.getBoundsInParent())) {
                     root.getChildren().remove(player);
                     isPlayerDead = true;
                 }
+
             }
         } catch (Exception e) {
 
         }
 
-        if (play) {
-            if (Math.random() < 0.020) {
+        if (play && !end) {
+            if (Math.random() < aliensRandomness) {
                 aliensL.add(initAlienL());
             }
-            if (Math.random() < 0.020) {
+            if (Math.random() < aliensRandomness) {
                 aliensR.add(initAlienR());
             }
+        }
+        if (isPlayerDead) {
+            if (smth) {
+                music.stopMusic();
+                gameOver();
+
+            }
+            smth = false;
         }
     }
 
@@ -911,7 +1004,8 @@ public class Window extends Application {
     private void shot() {
         if (!enablePowershot) {
 
-            Media sound = new Media(new File("music/Laser gun sound effect.mp3").toURI().toString());
+            final URL songPath = getClass().getResource("/music/Laser gun sound effect.mp3");
+            Media sound = new Media(songPath.toString());
             shotSound = new MediaPlayer(sound);
             shotSound.play();
 
@@ -921,7 +1015,8 @@ public class Window extends Application {
     }
 
     private void laserShot() {
-        Media sound = new Media(new File("music/Laser beam.mp3").toURI().toString());
+        final URL songPath = getClass().getResource("/music/Laser beam.mp3");
+        Media sound = new Media(songPath.toString());
         laserSound = new MediaPlayer(sound);
         laserSound.setAutoPlay(true);
         laserSound.play();
@@ -932,4 +1027,43 @@ public class Window extends Application {
 
     }
 
+    public void gameOver() {
+
+        final URL songPath = getClass().getResource("/music/gm.mp3");
+        Media sound = new Media(songPath.toString());
+        gameOverSound = new MediaPlayer(sound);
+        gameOverSound.play();
+
+        waveTimer.stop();
+        stopwatch.stop();
+
+        end = true;
+        play = false;
+
+        root.getChildren().remove(waveTime);
+        root.getChildren().remove(time);
+        root.getChildren().remove(fuelMeasurer);
+        root.getChildren().remove(powershotMeasurer);
+        root.getChildren().remove(fuelText);
+        root.getChildren().remove(laserBeamText);
+        root.getChildren().remove(fuelBar);
+        root.getChildren().remove(laserBar);
+
+        Text t = new Text("Game Over");
+        t.setFont(Font.font("Monospaced", 75));
+        t.setFill(Color.WHITE);
+        t.setX(460);
+        t.setY(100);
+
+        txt = new Text("You survived until wave " + (wave - 1));
+
+        txt.setFont(Font.font("Monospaced", 45));
+        txt.setFill(Color.WHITE);
+        txt.setX(330);
+        txt.setY(280);
+
+        root.getChildren().add(txt);
+        root.getChildren().add(t);
+
+    }
 }
