@@ -117,4 +117,8 @@ public class MusicPlayer {
     public void stopMusic() {
         mediaPlayer.stop();
     }
+    public void changeMusic() {
+        mediaPlayer.stop();
+        randomMusic();
+    }
 }

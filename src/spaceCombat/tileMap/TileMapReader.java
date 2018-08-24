@@ -15,6 +15,10 @@ public class TileMapReader {
     private static final String MARS_MAP = "tile_map.txt";
     private static final String MOON_MAP = "moon.txt";
     private static final String MENU_MAP = "menu.txt";
+    private static final String GREEN_MAP = "greenPlanet.txt";
+    private static final String SATURN_MAP = "saturn.txt";
+
+    
     private int type;
 
     public TileMapReader(int type) {
@@ -39,6 +43,14 @@ public class TileMapReader {
         
         if (type == 3) {
             mapUrl = ClassLoader.getSystemResourceAsStream(MOON_MAP);
+
+        }
+        if (type == 4) {
+            mapUrl = ClassLoader.getSystemResourceAsStream(GREEN_MAP);
+
+        }
+        if (type == 5) {
+            mapUrl = ClassLoader.getSystemResourceAsStream(SATURN_MAP);
 
         }
 
