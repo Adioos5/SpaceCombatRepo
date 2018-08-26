@@ -42,7 +42,18 @@ public class Window extends Application {
     private Boolean isPlayerDead = false;
     private Boolean menu = true;
     private Boolean end = false;
+    private Boolean shop = false;
+    private Boolean isBatBought = false;
+    private Boolean isBuzzBought = false;
+    private Boolean isDogeBought = false;
 
+    private String selectedSkin = "doge";
+
+    private Text notMoney;
+    private Text cash;
+    private Text bt;
+    private Text but;
+    private Text dt;
     private Text txt;
     private Text gameTitle;
     private Text playt;
@@ -65,6 +76,7 @@ public class Window extends Application {
     private double aliensRandomness = 0.015;
     private double aliensSpeed = 2;
     private int ufoSpeed = 5;
+    private int coins = 0;
 
     private Node player;
     private Node laser = initLaser();
@@ -77,16 +89,24 @@ public class Window extends Application {
     private ImageView av;
     private ImageView aD;
     private ImageView eD;
+    private ImageView sD;
+
     private ImageView imgV;
+    ImageView imgV3;
+    ImageView imgV2;
+    ImageView imgV4;
+    ImageView imgV1;
 
     private WaveTimer waveTimer;
     private Stopwatch stopwatch;
 
     private Rectangle fuelMeasurer;
     private Rectangle powershotMeasurer;
+    private Rectangle r;
+    private Rectangle boughtSkin;
+
     private Node fuelBar;
     private Node laserBar;
-    private Rectangle r;
 
     private MusicPlayer music;
     private MediaPlayer shotSound;
@@ -98,7 +118,8 @@ public class Window extends Application {
         launch(Window.class);
     }
 
-    public Pane createMenu() {
+    public Pane createMenu(int music) {
+
         if (root == null) {
             root = new Pane();
         } else {
@@ -127,20 +148,21 @@ public class Window extends Application {
 
             }
         }
-        final URL songPath = getClass().getResource("/music/Coldplay - Viva La Vida(8-bit).mp3");
-        Media sound = new Media(songPath.toString());
-        mediaPlayer = new MediaPlayer(sound);
-        mediaPlayer.setOnEndOfMedia(new Runnable() {
+        if (music == 1) {
+            final URL songPath = getClass().getResource("/music/Coldplay - Viva La Vida(8-bit).mp3");
+            Media sound = new Media(songPath.toString());
+            mediaPlayer = new MediaPlayer(sound);
+            mediaPlayer.setOnEndOfMedia(new Runnable() {
 
-            @Override
-            public void run() {
-                mediaPlayer.play();
+                @Override
+                public void run() {
+                    mediaPlayer.play();
 
-            }
+                }
 
-        });
-        mediaPlayer.play();
-
+            });
+            mediaPlayer.play();
+        }
         gameTitle = new Text("Space Combat™");
         gameTitle.setFont(Font.font("Monospaced", 85));
         gameTitle.setFill(Color.WHITE);
@@ -172,28 +194,28 @@ public class Window extends Application {
         q.setY(460);
 
         Image img = new Image("images/mars.png");
-        ImageView imgV = new ImageView(img);
-        imgV.setX(800);
-        imgV.setY(400);
-        imgV.setFitWidth(200);
-        imgV.setFitHeight(200);
+        imgV1 = new ImageView(img);
+        imgV1.setX(800);
+        imgV1.setY(400);
+        imgV1.setFitWidth(200);
+        imgV1.setFitHeight(200);
 
         Image img2 = new Image("images/green planet.png");
-        ImageView imgV2 = new ImageView(img2);
+        imgV2 = new ImageView(img2);
         imgV2.setX(270);
         imgV2.setY(380);
         imgV2.setFitWidth(150);
         imgV2.setFitHeight(150);
 
         Image img3 = new Image("images/moon.png");
-        ImageView imgV3 = new ImageView(img3);
+        imgV3 = new ImageView(img3);
         imgV3.setX(50);
         imgV3.setY(100);
         imgV3.setFitWidth(150);
         imgV3.setFitHeight(150);
 
         Image img4 = new Image("images/saturn.png");
-        ImageView imgV4 = new ImageView(img4);
+        imgV4 = new ImageView(img4);
         imgV4.setX(1000);
         imgV4.setY(200);
         imgV4.setFitWidth(80);
@@ -239,7 +261,7 @@ public class Window extends Application {
 
         };
 
-        root.getChildren().add(imgV);
+        root.getChildren().add(imgV1);
         root.getChildren().add(imgV2);
         root.getChildren().add(imgV3);
         root.getChildren().add(imgV4);
@@ -275,6 +297,12 @@ public class Window extends Application {
         t.setX(380);
         t.setY(100);
 
+        Text menu = new Text("Click \"x\" to return to menu");
+        menu.setFont(Font.font("Monospaced", 30));
+        menu.setFill(Color.WHITE);
+        menu.setX(410);
+        menu.setY(600);
+
         Image img = new Image("images/arrowD.png");
         aD = new ImageView(img);
         aD.setX(107);
@@ -284,6 +312,7 @@ public class Window extends Application {
 
         root.getChildren().add(t);
         root.getChildren().add(aD);
+        root.getChildren().add(menu);
     }
 
     public Pane createGame(int planet) {
@@ -620,13 +649,39 @@ public class Window extends Application {
     }
 
     private Node initPlayer() {
-        Image astronaut = new Image("images/ar.png");
-
-        astronautV = new ImageView(astronaut);
-        astronautV.setX(300);
-        astronautV.setY(360);
-        astronautV.setFitWidth(170);
-        astronautV.setFitHeight(170);
+        Image astronaut = null;
+        if (selectedSkin.equals("astr")) {
+            astronaut = new Image("images/ar.png");
+            astronautV = new ImageView(astronaut);
+            astronautV.setFitWidth(170);
+            astronautV.setFitHeight(170);
+            astronautV.setX(300);
+            astronautV.setY(360);
+        }
+        if (selectedSkin.equals("bat")) {
+            astronaut = new Image("images/batmanr.png");
+            astronautV = new ImageView(astronaut);
+            astronautV.setFitWidth(170);
+            astronautV.setFitHeight(170);
+            astronautV.setX(300);
+            astronautV.setY(347);
+        }
+        if (selectedSkin.equals("buzz")) {
+            astronaut = new Image("images/buzzr.png");
+            astronautV = new ImageView(astronaut);
+            astronautV.setFitWidth(170);
+            astronautV.setFitHeight(170);
+            astronautV.setX(300);
+            astronautV.setY(354);
+        }
+        if (selectedSkin.equals("doge")) {
+            astronaut = new Image("images/doger.png");
+            astronautV = new ImageView(astronaut);
+            astronautV.setFitWidth(170);
+            astronautV.setFitHeight(170);
+            astronautV.setX(300);
+            astronautV.setY(345);
+        }
 
         return astronautV;
     }
@@ -635,8 +690,13 @@ public class Window extends Application {
         Image shot = new Image("images/shot.png");
 
         ImageView shotV = new ImageView(shot);
+        if (selectedSkin.equals("doge")) {
+            shotV.setY(player.getTranslateY() + 414);
+        } else {
+            shotV.setY(player.getTranslateY() + 394);
+
+        }
         shotV.setX(player.getTranslateX() + 460);
-        shotV.setY(player.getTranslateY() + 394);
         shotV.setFitWidth(50);
         shotV.setFitHeight(35);
         root.getChildren().add(shotV);
@@ -648,8 +708,13 @@ public class Window extends Application {
         Image shot = new Image("images/shot.png");
 
         ImageView shotV = new ImageView(shot);
+        if (selectedSkin.equals("doge")) {
+            shotV.setY(player.getTranslateY() + 414);
+        } else {
+            shotV.setY(player.getTranslateY() + 394);
+
+        }
         shotV.setX(player.getTranslateX() + 260);
-        shotV.setY(player.getTranslateY() + 394);
         shotV.setFitWidth(50);
         shotV.setFitHeight(35);
         root.getChildren().add(shotV);
@@ -659,7 +724,12 @@ public class Window extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Scene scene = new Scene(createMenu());
+
+        boughtSkin = new Rectangle(190, 5, Color.GREENYELLOW);
+        boughtSkin.setTranslateX(70);
+        boughtSkin.setTranslateY(440);
+
+        Scene scene = new Scene(createMenu(1));
         stage.setScene(scene);
         stage.setMaxWidth(1300);
         stage.setMaxHeight(656);
@@ -670,7 +740,7 @@ public class Window extends Application {
         stage.getScene().setOnKeyPressed(event -> {
             switch (event.getCode()) {
             case RIGHT:
-                if (!menu && !choosePlanet) {
+                if (!menu && !choosePlanet && !shop) {
                     if (!isPlayerDead) {
                         moveRight();
 
@@ -691,12 +761,16 @@ public class Window extends Application {
                 if (end) {
                     eD.setX(824);
                 }
+                if (shop&&sD.getX()!=1110) {
+                    
+                    sD.setX(sD.getX() + 320);
+                }
                 break;
             case LEFT:
                 if (end) {
                     eD.setX(470);
                 }
-                if (!menu && !choosePlanet) {
+                if (!menu && !choosePlanet && !shop) {
                     if (!isPlayerDead) {
                         moveLeft();
                     }
@@ -712,6 +786,9 @@ public class Window extends Application {
                 if (choosePlanet && aD.getX() == 1015) {
                     aD.setX(876);
                     aD.setY(360);
+                }
+                if (shop&&sD.getX()!=150) {
+                    sD.setX(sD.getX() - 320);
                 }
                 break;
             case UP:
@@ -742,29 +819,109 @@ public class Window extends Application {
                     if (!isPlayerDead) {
                         if (!isJumping && !isFalling && !root.getChildren().contains(imgV)) {
 
-                            if (position == 1) {
+                            if (selectedSkin.equals("astr")) {
+                                if (position == 1) {
 
-                                Image img = new Image("images/MLG_Glasses.png");
-                                imgV = new ImageView(img);
+                                    Image img = new Image("images/MLG_Glasses.png");
+                                    imgV = new ImageView(img);
 
-                                imgV.setX(player.getTranslateX() + 337);
-                                imgV.setY(player.getTranslateY() + 360);
-                                imgV.setFitWidth(80);
-                                imgV.setFitHeight(50);
+                                    imgV.setX(player.getTranslateX() + 337);
+                                    imgV.setY(player.getTranslateY() + 360);
+                                    imgV.setFitWidth(80);
+                                    imgV.setFitHeight(50);
 
-                                root.getChildren().add(imgV);
+                                    root.getChildren().add(imgV);
+                                }
+                                if (position == 0) {
+
+                                    Image img = new Image("images/MLG_Glasses2.png");
+                                    imgV = new ImageView(img);
+
+                                    imgV.setX(player.getTranslateX() + 350);
+                                    imgV.setY(player.getTranslateY() + 360);
+                                    imgV.setFitWidth(80);
+                                    imgV.setFitHeight(50);
+
+                                    root.getChildren().add(imgV);
+                                }
                             }
-                            if (position == 0) {
+                            if (selectedSkin.equals("bat")) {
+                                if (position == 1) {
 
-                                Image img = new Image("images/MLG_Glasses2.png");
-                                imgV = new ImageView(img);
+                                    Image img = new Image("images/MLG_Glasses.png");
+                                    imgV = new ImageView(img);
 
-                                imgV.setX(player.getTranslateX() + 350);
-                                imgV.setY(player.getTranslateY() + 360);
-                                imgV.setFitWidth(80);
-                                imgV.setFitHeight(50);
+                                    imgV.setX(player.getTranslateX() + 340);
+                                    imgV.setY(player.getTranslateY() + 353);
+                                    imgV.setFitWidth(80);
+                                    imgV.setFitHeight(50);
 
-                                root.getChildren().add(imgV);
+                                    root.getChildren().add(imgV);
+                                }
+                                if (position == 0) {
+
+                                    Image img = new Image("images/MLG_Glasses2.png");
+                                    imgV = new ImageView(img);
+
+                                    imgV.setX(player.getTranslateX() + 352);
+                                    imgV.setY(player.getTranslateY() + 353);
+                                    imgV.setFitWidth(80);
+                                    imgV.setFitHeight(50);
+
+                                    root.getChildren().add(imgV);
+                                }
+                            }
+                            if (selectedSkin.equals("buzz")) {
+                                if (position == 1) {
+
+                                    Image img = new Image("images/MLG_Glasses.png");
+                                    imgV = new ImageView(img);
+
+                                    imgV.setX(player.getTranslateX() + 362);
+                                    imgV.setY(player.getTranslateY() + 363);
+                                    imgV.setFitWidth(40);
+                                    imgV.setFitHeight(25);
+
+                                    root.getChildren().add(imgV);
+                                }
+                                if (position == 0) {
+
+                                    Image img = new Image("images/MLG_Glasses2.png");
+                                    imgV = new ImageView(img);
+
+                                    imgV.setX(player.getTranslateX() + 367);
+                                    imgV.setY(player.getTranslateY() + 364);
+                                    imgV.setFitWidth(40);
+                                    imgV.setFitHeight(25);
+
+                                    root.getChildren().add(imgV);
+                                }
+                            }
+                            if (selectedSkin.equals("doge")) {
+                                if (position == 1) {
+                                    Image img = new Image("images/MLG_Glasses2.png");
+
+                                    imgV = new ImageView(img);
+
+                                    imgV.setX(player.getTranslateX() + 344);
+                                    imgV.setY(player.getTranslateY() + 355);
+                                    imgV.setFitWidth(80);
+                                    imgV.setFitHeight(50);
+
+                                    root.getChildren().add(imgV);
+                                }
+                                if (position == 0) {
+
+                                    Image img = new Image("images/MLG_Glasses.png");
+                                    imgV = new ImageView(img);
+
+                                    imgV.setX(player.getTranslateX() + 345);
+                                    imgV.setY(player.getTranslateY() + 355);
+                                    imgV.setFitWidth(80);
+                                    imgV.setFitHeight(50);
+
+                                    root.getChildren().add(imgV);
+                                }
                             }
                         }
                     }
@@ -772,7 +929,7 @@ public class Window extends Application {
                 break;
 
             case SPACE:
-                if (!menu && !choosePlanet) {
+                if (!menu && !choosePlanet && !shop) {
                     if (!isPlayerDead) {
 
                         shot();
@@ -789,6 +946,95 @@ public class Window extends Application {
                 }
                 break;
             case ENTER:
+                if (shop && sD.getX() == 150) {
+                    selectedSkin = "astr";
+                    boughtSkin.setTranslateX(70);
+                    notMoney.setText("");
+                }
+                if (shop && sD.getX() == 470) {
+
+                    if (!isBatBought) {
+                        if (coins < 500) {
+                            notMoney.setText("Not enough money!");
+                        }
+                        if (coins >= 500) {
+                            notMoney.setText("");
+                            selectedSkin = "bat";
+                            bt.setText("Unlocked");
+                            bt.setX(bt.getX() + 20);
+                            boughtSkin.setTranslateX(400);
+                            isBatBought = true;
+                            coins -= 500;
+                            cash.setText(coins + " coins");
+
+                            final URL songPath = getClass().getResource("/music/cash.mp3");
+                            Media sound = new Media(songPath.toString());
+                            MediaPlayer cash = new MediaPlayer(sound);
+                            cash.play();
+                        }
+                    }
+                    if (isBatBought) {
+                        notMoney.setText("");
+                        selectedSkin = "bat";
+                        boughtSkin.setTranslateX(400);
+                    }
+                }
+                if (shop && sD.getX() == 790) {
+
+                    if (!isBuzzBought) {
+                        if (coins < 1000) {
+                            notMoney.setText("Not enough money!");
+                        }
+                        if (coins >= 1000) {
+                            notMoney.setText("");
+                            selectedSkin = "buzz";
+                            but.setText("Unlocked");
+                            but.setX(but.getX() + 20);
+                            boughtSkin.setTranslateX(720);
+                            isBuzzBought = true;
+                            coins -= 1000;
+                            cash.setText(coins + " coins");
+
+                            final URL songPath = getClass().getResource("/music/cash.mp3");
+                            Media sound = new Media(songPath.toString());
+                            MediaPlayer cash = new MediaPlayer(sound);
+                            cash.play();
+                        }
+                    }
+                    if (isBuzzBought) {
+                        notMoney.setText("");
+                        selectedSkin = "buzz";
+                        boughtSkin.setTranslateX(720);
+                    }
+                }
+                if (shop && sD.getX() == 1110) {
+
+                    if (!isDogeBought) {
+                        if (coins < 2000) {
+                            notMoney.setText("Not enough money!");
+                        }
+                        if (coins >= 2000) {
+                            notMoney.setText("");
+                            selectedSkin = "doge";
+                            dt.setText("Unlocked");
+                            dt.setX(dt.getX() + 20);
+                            boughtSkin.setTranslateX(1040);
+                            isDogeBought = true;
+                            coins -= 2000;
+                            cash.setText(coins + " coins");
+
+                            final URL songPath = getClass().getResource("/music/cash.mp3");
+                            Media sound = new Media(songPath.toString());
+                            MediaPlayer cash = new MediaPlayer(sound);
+                            cash.play();
+                        }
+                    }
+                    if (isBuzzBought) {
+                        notMoney.setText("");
+                        selectedSkin = "doge";
+                        boughtSkin.setTranslateX(1040);
+                    }
+                }
 
                 if (choosePlanet && aD.getX() == 876) {
 
@@ -810,6 +1056,9 @@ public class Window extends Application {
 
                     if (av.getY() == 185) {
                         choosePlanet();
+                    }
+                    if (av.getY() == 265) {
+                        shop();
                     }
                     if (av.getY() == 425) {
                         System.exit(0);
@@ -853,8 +1102,9 @@ public class Window extends Application {
                     aliensSpeed = 2;
                     ufoSpeed = 5;
 
-                    createMenu();
+                    createMenu(1);
                 }
+
                 break;
 
             case Y:
@@ -863,6 +1113,48 @@ public class Window extends Application {
             case U:
                 music.stopMusic();
                 break;
+            case X:
+                if (shop || choosePlanet) {
+
+                    shop = false;
+                    choosePlanet = false;
+
+                    menuTimer.stop();
+
+                    play = false;
+                    smth = true;
+                    choosePlanet = false;
+                    startWave = true;
+                    ufoLeft = true;
+                    ufoRight = false;
+                    isJumping = false;
+                    isFalling = false;
+                    hasShot = false;
+                    addShot = false;
+                    powershot = false;
+                    decreasePowershot = true;
+                    enablePowershot = false;
+                    addLaser = false;
+                    isPlayerDead = false;
+                    menu = true;
+                    end = false;
+
+                    av.setX(185);
+
+                    aliensL = new ArrayList<>();
+                    aliensR = new ArrayList<>();
+                    rightShots = new ArrayList<>();
+                    leftShots = new ArrayList<>();
+
+                    position = 1;
+                    wave = 1;
+                    tileSize = 32;
+                    aliensRandomness = 0.015;
+                    aliensSpeed = 2;
+                    ufoSpeed = 5;
+
+                    createMenu(0);
+                }
             default:
             }
         });
@@ -884,10 +1176,37 @@ public class Window extends Application {
         }
 
         if (isJumping || isFalling) {
-            astronautV.setImage(new Image("images/afr.png"));
-        } else {
-            astronautV.setImage(new Image("images/ar.png"));
+            if (selectedSkin.equals("astr")) {
+                astronautV.setImage(new Image("images/afr.png"));
+            }
+            if (selectedSkin.equals("bat")) {
+                astronautV.setImage(new Image("images/batmanfr.png"));
 
+            }
+            if (selectedSkin.equals("buzz")) {
+                astronautV.setImage(new Image("images/buzzfr.png"));
+
+            }
+            if (selectedSkin.equals("doge")) {
+                astronautV.setImage(new Image("images/dogefr.png"));
+
+            }
+        } else {
+            if (selectedSkin.equals("astr")) {
+                astronautV.setImage(new Image("images/ar.png"));
+            }
+            if (selectedSkin.equals("bat")) {
+                astronautV.setImage(new Image("images/batmanr.png"));
+
+            }
+            if (selectedSkin.equals("buzz")) {
+                astronautV.setImage(new Image("images/buzzr.png"));
+
+            }
+            if (selectedSkin.equals("doge")) {
+                astronautV.setImage(new Image("images/doger.png"));
+
+            }
         }
 
     }
@@ -901,10 +1220,37 @@ public class Window extends Application {
         }
 
         if (isJumping || isFalling) {
-            astronautV.setImage(new Image("images/afl.png"));
-        } else {
-            astronautV.setImage(new Image("images/al.png"));
+            if (selectedSkin.equals("astr")) {
+                astronautV.setImage(new Image("images/afl.png"));
+            }
+            if (selectedSkin.equals("bat")) {
+                astronautV.setImage(new Image("images/batmanfl.png"));
 
+            }
+            if (selectedSkin.equals("buzz")) {
+                astronautV.setImage(new Image("images/buzzfl.png"));
+
+            }
+            if (selectedSkin.equals("doge")) {
+                astronautV.setImage(new Image("images/dogefl.png"));
+
+            }
+        } else {
+            if (selectedSkin.equals("astr")) {
+                astronautV.setImage(new Image("images/al.png"));
+            }
+            if (selectedSkin.equals("bat")) {
+                astronautV.setImage(new Image("images/batmanl.png"));
+
+            }
+            if (selectedSkin.equals("buzz")) {
+                astronautV.setImage(new Image("images/buzzl.png"));
+
+            }
+            if (selectedSkin.equals("doge")) {
+                astronautV.setImage(new Image("images/dogefl.png"));
+
+            }
         }
     }
 
@@ -918,11 +1264,37 @@ public class Window extends Application {
             root.getChildren().remove(imgV);
         }
         if (position == 1) {
-            astronautV.setImage(new Image("images/afr.png"));
+            if (selectedSkin.equals("astr")) {
+                astronautV.setImage(new Image("images/afr.png"));
+            }
+            if (selectedSkin.equals("bat")) {
+                astronautV.setImage(new Image("images/batmanfr.png"));
 
+            }
+            if (selectedSkin.equals("buzz")) {
+                astronautV.setImage(new Image("images/buzzfr.png"));
+
+            }
+            if (selectedSkin.equals("doge")) {
+                astronautV.setImage(new Image("images/dogefr.png"));
+
+            }
         } else if (position == 0) {
-            astronautV.setImage(new Image("images/afl.png"));
+            if (selectedSkin.equals("astr")) {
+                astronautV.setImage(new Image("images/afl.png"));
+            }
+            if (selectedSkin.equals("bat")) {
+                astronautV.setImage(new Image("images/batmanfl.png"));
 
+            }
+            if (selectedSkin.equals("buzz")) {
+                astronautV.setImage(new Image("images/buzzfl.png"));
+
+            }
+            if (selectedSkin.equals("doge")) {
+                astronautV.setImage(new Image("images/dogefl.png"));
+
+            }
         }
     }
 
@@ -941,11 +1313,37 @@ public class Window extends Application {
             isJumping = false;
 
             if (position == 1) {
-                astronautV.setImage(new Image("images/ar.png"));
+                if (selectedSkin.equals("astr")) {
+                    astronautV.setImage(new Image("images/ar.png"));
+                }
+                if (selectedSkin.equals("bat")) {
+                    astronautV.setImage(new Image("images/batmanr.png"));
 
+                }
+                if (selectedSkin.equals("buzz")) {
+                    astronautV.setImage(new Image("images/buzzr.png"));
+
+                }
+                if (selectedSkin.equals("doge")) {
+                    astronautV.setImage(new Image("images/doger.png"));
+
+                }
             } else if (position == 0) {
-                astronautV.setImage(new Image("images/al.png"));
+                if (selectedSkin.equals("astr")) {
+                    astronautV.setImage(new Image("images/al.png"));
+                }
+                if (selectedSkin.equals("bat")) {
+                    astronautV.setImage(new Image("images/batmanl.png"));
 
+                }
+                if (selectedSkin.equals("buzz")) {
+                    astronautV.setImage(new Image("images/buzzl.png"));
+
+                }
+                if (selectedSkin.equals("doge")) {
+                    astronautV.setImage(new Image("images/dogel.png"));
+
+                }
             }
 
         }
@@ -1110,13 +1508,23 @@ public class Window extends Application {
 
                 }
             }
+            if (selectedSkin.equals("doge")) {
+                laser.setTranslateY(player.getTranslateY() + 430);
 
-            laser.setTranslateY(player.getTranslateY() + 410);
-            if (position == 1) {
-                laser.setTranslateX(player.getTranslateX() + 468);
-            }
-            if (position == 0) {
-                laser.setTranslateX(player.getTranslateX() - 697);
+                if (position == 1) {
+                    laser.setTranslateX(player.getTranslateX() + 448);
+                }
+                if (position == 0) {
+                    laser.setTranslateX(player.getTranslateX() - 677);
+                }
+            } else {
+                laser.setTranslateY(player.getTranslateY() + 410);
+                if (position == 1) {
+                    laser.setTranslateX(player.getTranslateX() + 468);
+                }
+                if (position == 0) {
+                    laser.setTranslateX(player.getTranslateX() - 697);
+                }
             }
 
         }
@@ -1200,6 +1608,9 @@ public class Window extends Application {
         end = true;
         play = false;
 
+        int tempCoins = ((wave - 1) * 100);
+        coins += ((wave - 1) * 100);
+
         root.getChildren().remove(waveTime);
         root.getChildren().remove(time);
         root.getChildren().remove(fuelMeasurer);
@@ -1220,7 +1631,14 @@ public class Window extends Application {
         txt.setFont(Font.font("Monospaced", 45));
         txt.setFill(Color.WHITE);
         txt.setX(330);
-        txt.setY(280);
+        txt.setY(220);
+
+        Text txt2 = new Text(tempCoins + " coins earned");
+
+        txt2.setFont(Font.font("Monospaced", 45));
+        txt2.setFill(Color.WHITE);
+        txt2.setX(440);
+        txt2.setY(290);
 
         Image img = new Image("images/arrowD.png");
         eD = new ImageView(img);
@@ -1242,10 +1660,134 @@ public class Window extends Application {
         quit.setY(400);
 
         root.getChildren().add(txt);
+        root.getChildren().add(txt2);
         root.getChildren().add(t);
         root.getChildren().add(eD);
         root.getChildren().add(menu);
         root.getChildren().add(quit);
 
+    }
+
+    public void shop() {
+
+        shop = true;
+        menu = false;
+
+        root.getChildren().remove(gameTitle);
+        root.getChildren().remove(playt);
+        root.getChildren().remove(q);
+        root.getChildren().remove(op);
+        root.getChildren().remove(sh);
+        root.getChildren().remove(av);
+        root.getChildren().remove(r);
+        root.getChildren().remove(imgV1);
+        root.getChildren().remove(imgV2);
+        root.getChildren().remove(imgV3);
+        root.getChildren().remove(imgV4);
+
+        Text text = new Text("Shop");
+        text.setFont(Font.font("Monospaced", 65));
+        text.setFill(Color.WHITE);
+        text.setX(570);
+        text.setY(100);
+
+        Text menu = new Text("Click \"x\" to return to menu");
+        menu.setFont(Font.font("Monospaced", 30));
+        menu.setFill(Color.WHITE);
+        menu.setX(410);
+        menu.setY(600);
+
+        cash = new Text(coins + " coins");
+        cash.setFont(Font.font("Monospaced", 40));
+        cash.setFill(Color.WHITE);
+        cash.setX(1000);
+        cash.setY(100);
+
+        Image img = new Image("images/arrowD.png");
+        sD = new ImageView(img);
+        sD.setX(150);
+        sD.setY(150);
+        sD.setFitWidth(50);
+        sD.setFitHeight(50);
+
+        Image imgA = new Image("images/ar.png");
+        ImageView a = new ImageView(imgA);
+        a.setX(80);
+        a.setY(250);
+        a.setFitWidth(200);
+        a.setFitHeight(200);
+
+        Image imgB = new Image("images/batmanr.png");
+        ImageView b = new ImageView(imgB);
+        b.setX(400);
+        b.setY(240);
+        b.setFitWidth(200);
+        b.setFitHeight(200);
+
+        Image imgBu = new Image("images/buzzr.png");
+        ImageView bu = new ImageView(imgBu);
+        bu.setX(720);
+        bu.setY(250);
+        bu.setFitWidth(200);
+        bu.setFitHeight(200);
+        
+        Image imgD = new Image("images/doger.png");
+        ImageView d = new ImageView(imgD);
+        d.setX(1040);
+        d.setY(237);
+        d.setFitWidth(200);
+        d.setFitHeight(200);
+
+        Text at = new Text("Unlocked");
+        at.setFont(Font.font("Monospaced", 25));
+        at.setFill(Color.WHITE);
+        at.setX(110);
+        at.setY(480);
+
+        if (!isBatBought) {
+            bt = new Text("500 coins");
+            bt.setFont(Font.font("Monospaced", 25));
+            bt.setFill(Color.WHITE);
+            bt.setX(420);
+            bt.setY(480);
+        }
+        if (!isBuzzBought) {
+            but = new Text("1000 coins");
+            but.setFont(Font.font("Monospaced", 25));
+            but.setFill(Color.WHITE);
+            but.setX(740);
+            but.setY(480);
+        }
+        if (!isDogeBought) {
+            dt = new Text("2000 coins");
+            dt.setFont(Font.font("Monospaced", 25));
+            dt.setFill(Color.WHITE);
+            dt.setX(1060);
+            dt.setY(480);
+        }
+
+        notMoney = new Text("");
+        notMoney.setX(940);
+        notMoney.setY(50);
+        notMoney.setFont(Font.font("Monospaced", 30));
+        notMoney.setFill(Color.WHITE);
+
+        root.getChildren().add(text);
+        root.getChildren().add(sD);
+        root.getChildren().add(a);
+        root.getChildren().add(b);
+        root.getChildren().add(bu);
+        root.getChildren().add(d);
+
+        root.getChildren().add(boughtSkin);
+
+        root.getChildren().add(at);
+        root.getChildren().add(menu);
+        root.getChildren().add(bt);
+        root.getChildren().add(but);
+        root.getChildren().add(dt);
+        root.getChildren().add(notMoney);
+
+        root.getChildren().add(cash);
     }
 }
