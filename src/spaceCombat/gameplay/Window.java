@@ -43,12 +43,39 @@ public class Window extends Application {
     private Boolean menu = true;
     private Boolean end = false;
     private Boolean shop = false;
+    private Boolean help = false;
     private Boolean isBatBought = false;
     private Boolean isBuzzBought = false;
     private Boolean isDogeBought = false;
 
-    private String selectedSkin = "doge";
+    private String selectedSkin = "astr";
 
+    private AnimationTimer creditsTimer;
+
+    private Text t1;
+    private Text t2;
+    private Text t3;
+    private Text t4;
+    private Text t5;
+    private Text t6;
+    private Text t7;
+
+    private Text j1;
+    private Text j2;
+    private Text j3;
+    private Text j4;
+    private Text j5;
+    private Text j6;
+    private Text j7;
+    private Text j8;
+
+    private Text aa;
+    private Text aaa;
+    private Text aaaa;
+    private Text aaaaa;
+    private Text aaaaaa;
+    private Text aaaaaaa;
+    private Text aaaaaaaa;
     private Text notMoney;
     private Text cash;
     private Text bt;
@@ -67,6 +94,9 @@ public class Window extends Application {
 
     private List<Node> aliensL = new ArrayList<>();
     private List<Node> aliensR = new ArrayList<>();
+    private List<Node> ufosL = new ArrayList<>();
+    private List<Node> ufosR = new ArrayList<>();
+    private List<Node> ufoShots = new ArrayList<>();
     private List<Node> rightShots = new ArrayList<>();
     private List<Node> leftShots = new ArrayList<>();
 
@@ -75,8 +105,10 @@ public class Window extends Application {
     private static int tileSize = 32;
     private double aliensRandomness = 0.015;
     private double aliensSpeed = 2;
+    private double ufosSpeed = 3;
     private int ufoSpeed = 5;
     private int coins = 0;
+    private double ufoRandomness = 0.0003;
 
     private Node player;
     private Node laser = initLaser();
@@ -88,14 +120,15 @@ public class Window extends Application {
     private ImageView uv;
     private ImageView av;
     private ImageView aD;
+    private ImageView hD;
     private ImageView eD;
     private ImageView sD;
 
     private ImageView imgV;
-    ImageView imgV3;
-    ImageView imgV2;
-    ImageView imgV4;
-    ImageView imgV1;
+    private ImageView imgV3;
+    private ImageView imgV2;
+    private ImageView imgV4;
+    private ImageView imgV1;
 
     private WaveTimer waveTimer;
     private Stopwatch stopwatch;
@@ -163,10 +196,10 @@ public class Window extends Application {
             });
             mediaPlayer.play();
         }
-        gameTitle = new Text("Space Combat™");
+        gameTitle = new Text("Space Combat");
         gameTitle.setFont(Font.font("Monospaced", 85));
         gameTitle.setFill(Color.WHITE);
-        gameTitle.setX(330);
+        gameTitle.setX(340);
         gameTitle.setY(100);
 
         playt = new Text("Play");
@@ -553,6 +586,7 @@ public class Window extends Application {
                         aliensSpeed += 0.6;
                         wave += 1;
                         aliensRandomness += 0.005;
+                        ufoRandomness += 0.0003;
 
                         waveTimer = new WaveTimer();
                         waveTimer.start();
@@ -606,6 +640,32 @@ public class Window extends Application {
         alienV.setFitWidth(80);
         alienV.setTranslateX(1300);
         alienV.setTranslateY(355);
+
+        root.getChildren().add(alienV);
+
+        return alienV;
+    }
+
+    private Node initUfoL() {
+        Image alien = new Image("images/ufo.png");
+        ImageView alienV = new ImageView(alien);
+        alienV.setFitHeight(80);
+        alienV.setFitWidth(160);
+        alienV.setTranslateX(-160);
+        alienV.setTranslateY(150);
+
+        root.getChildren().add(alienV);
+
+        return alienV;
+    }
+
+    private Node initUfoR() {
+        Image alien = new Image("images/ufo.png");
+        ImageView alienV = new ImageView(alien);
+        alienV.setFitHeight(80);
+        alienV.setFitWidth(160);
+        alienV.setTranslateX(1320);
+        alienV.setTranslateY(150);
 
         root.getChildren().add(alienV);
 
@@ -733,14 +793,14 @@ public class Window extends Application {
         stage.setScene(scene);
         stage.setMaxWidth(1300);
         stage.setMaxHeight(656);
-        stage.setTitle("Space Combat™");
+        stage.setTitle("Space Combat");
         stage.setResizable(false);
         stage.getIcons().add(new Image("images/SpaceCombatIcon.png"));
 
         stage.getScene().setOnKeyPressed(event -> {
             switch (event.getCode()) {
             case RIGHT:
-                if (!menu && !choosePlanet && !shop) {
+                if (!menu && !choosePlanet && !shop && !help) {
                     if (!isPlayerDead) {
                         moveRight();
 
@@ -761,8 +821,8 @@ public class Window extends Application {
                 if (end) {
                     eD.setX(824);
                 }
-                if (shop&&sD.getX()!=1110) {
-                    
+                if (shop && sD.getX() != 1110) {
+
                     sD.setX(sD.getX() + 320);
                 }
                 break;
@@ -770,7 +830,7 @@ public class Window extends Application {
                 if (end) {
                     eD.setX(470);
                 }
-                if (!menu && !choosePlanet && !shop) {
+                if (!menu && !choosePlanet && !shop && !help) {
                     if (!isPlayerDead) {
                         moveLeft();
                     }
@@ -787,35 +847,313 @@ public class Window extends Application {
                     aD.setX(876);
                     aD.setY(360);
                 }
-                if (shop&&sD.getX()!=150) {
+                if (shop && sD.getX() != 150) {
                     sD.setX(sD.getX() - 320);
                 }
                 break;
             case UP:
-                if (!menu && !choosePlanet) {
+                if (!menu && !choosePlanet && !help && !shop) {
                     if (!isPlayerDead) {
                         jump();
                     }
                 }
-                if (av.getY() != 185) {
+                if (av.getY() != 185 && menu) {
                     av.setY(av.getY() - 80);
 
                 }
-                if (r.getTranslateY() != 235) {
+                if (r.getTranslateY() != 235 && menu) {
                     r.setTranslateY(r.getTranslateY() - 80);
+                }
+                if (help) {
+                    if (hD.getY() != 170) {
+                        hD.setY(hD.getY() - 100);
+
+                    }
+                    if (hD.getY() == 170 && !root.getChildren().contains(aa)) {
+
+                        aa = new Text("Move left/Move right - Left arrow/Right arrow");
+                        aa.setFont(Font.font("Monospaced", 25));
+                        aa.setFill(Color.WHITE);
+                        aa.setX(450);
+                        aa.setY(100);
+
+                        aaa = new Text("Jump - Upward arrow");
+                        aaa.setFont(Font.font("Monospaced", 25));
+                        aaa.setFill(Color.WHITE);
+                        aaa.setX(450);
+                        aaa.setY(150);
+
+                        aaaa = new Text("Shoot - Space");
+                        aaaa.setFont(Font.font("Monospaced", 25));
+                        aaaa.setFill(Color.WHITE);
+                        aaaa.setX(450);
+                        aaaa.setY(200);
+                        aaaaa = new Text("Laser Beam - E");
+                        aaaaa.setFont(Font.font("Monospaced", 25));
+                        aaaaa.setFill(Color.WHITE);
+                        aaaaa.setX(450);
+                        aaaaa.setY(250);
+
+                        aaaaaa = new Text("MLG Glasses - W");
+                        aaaaaa.setFont(Font.font("Monospaced", 25));
+                        aaaaaa.setFill(Color.WHITE);
+                        aaaaaa.setX(450);
+                        aaaaaa.setY(300);
+
+                        aaaaaaa = new Text("Change music - Y");
+                        aaaaaaa.setFont(Font.font("Monospaced", 25));
+                        aaaaaaa.setFill(Color.WHITE);
+                        aaaaaaa.setX(450);
+                        aaaaaaa.setY(350);
+
+                        aaaaaaaa = new Text("Mute music - U");
+                        aaaaaaaa.setFont(Font.font("Monospaced", 25));
+                        aaaaaaaa.setFill(Color.WHITE);
+                        aaaaaaaa.setX(450);
+                        aaaaaaaa.setY(400);
+
+                        root.getChildren().remove(t1);
+                        root.getChildren().remove(t2);
+                        root.getChildren().remove(t3);
+                        root.getChildren().remove(t4);
+                        root.getChildren().remove(t5);
+                        root.getChildren().remove(t6);
+                        root.getChildren().remove(t7);
+
+                        root.getChildren().add(aa);
+                        root.getChildren().add(aaa);
+                        root.getChildren().add(aaaa);
+                        root.getChildren().add(aaaaa);
+                        root.getChildren().add(aaaaaa);
+                        root.getChildren().add(aaaaaaa);
+                        root.getChildren().add(aaaaaaaa);
+                    }
+                    if (hD.getY() == 270 && !root.getChildren().contains(t1)) {
+                        creditsTimer.stop();
+                        root.getChildren().remove(j1);
+                        root.getChildren().remove(j2);
+                        root.getChildren().remove(j3);
+                        root.getChildren().remove(j4);
+                        root.getChildren().remove(j5);
+                        root.getChildren().remove(j6);
+                        root.getChildren().remove(j7);
+                        root.getChildren().remove(j8);
+
+                        t1 = new Text("Space Combat is a 2D shooter in which player has to survive");
+                        t1.setFont(Font.font("Monospaced", 25));
+                        t1.setFill(Color.WHITE);
+                        t1.setX(350);
+                        t1.setY(100);
+
+                        t2 = new Text("as many waves as it's possible. Player is being attacked by");
+                        t2.setFont(Font.font("Monospaced", 25));
+                        t2.setFill(Color.WHITE);
+                        t2.setX(350);
+                        t2.setY(150);
+
+                        t3 = new Text("a horde of aliens that aren't pleased with his visit on their");
+                        t3.setFont(Font.font("Monospaced", 25));
+                        t3.setFill(Color.WHITE);
+                        t3.setX(350);
+                        t3.setY(200);
+
+                        t4 = new Text("planet. The more waves you survive, the more coins you earn.");
+                        t4.setFont(Font.font("Monospaced", 25));
+                        t4.setFill(Color.WHITE);
+                        t4.setX(350);
+                        t4.setY(250);
+
+                        t5 = new Text("You can spend them on playable skins that are waiting for you");
+                        t5.setFont(Font.font("Monospaced", 25));
+                        t5.setFill(Color.WHITE);
+                        t5.setX(350);
+                        t5.setY(300);
+
+                        t6 = new Text("in a shop. So what are you waiting for? Land on some planet,");
+                        t6.setFont(Font.font("Monospaced", 25));
+                        t6.setFill(Color.WHITE);
+                        t6.setX(350);
+                        t6.setY(350);
+
+                        t7 = new Text("battle aliens and have fun!");
+                        t7.setFont(Font.font("Monospaced", 25));
+                        t7.setFill(Color.WHITE);
+                        t7.setX(350);
+                        t7.setY(400);
+
+                        root.getChildren().add(t1);
+                        root.getChildren().add(t2);
+                        root.getChildren().add(t3);
+                        root.getChildren().add(t4);
+                        root.getChildren().add(t5);
+                        root.getChildren().add(t6);
+                        root.getChildren().add(t7);
+
+                    }
                 }
                 break;
             case DOWN:
 
-                if (av.getY() != 425) {
+                if (av.getY() != 425 && menu) {
                     av.setY(av.getY() + 80);
                 }
-                if (r.getTranslateY() != 475) {
+                if (r.getTranslateY() != 475 && menu) {
                     r.setTranslateY(r.getTranslateY() + 80);
+                }
+                if (help) {
+                    if (hD.getY() != 370) {
+                        hD.setY(hD.getY() + 100);
+
+                    }
+                    if (hD.getY() == 270 && !root.getChildren().contains(t1)) {
+                        root.getChildren().remove(aa);
+                        root.getChildren().remove(aaa);
+                        root.getChildren().remove(aaaa);
+                        root.getChildren().remove(aaaaa);
+                        root.getChildren().remove(aaaaaa);
+                        root.getChildren().remove(aaaaaaa);
+                        root.getChildren().remove(aaaaaaaa);
+
+                        t1 = new Text("Space Combat is a 2D shooter in which player has to survive");
+                        t1.setFont(Font.font("Monospaced", 25));
+                        t1.setFill(Color.WHITE);
+                        t1.setX(350);
+                        t1.setY(100);
+
+                        t2 = new Text("as many waves as it's possible. Player is being attacked by");
+                        t2.setFont(Font.font("Monospaced", 25));
+                        t2.setFill(Color.WHITE);
+                        t2.setX(350);
+                        t2.setY(150);
+
+                        t3 = new Text("a horde of aliens that aren't pleased with his visit on their");
+                        t3.setFont(Font.font("Monospaced", 25));
+                        t3.setFill(Color.WHITE);
+                        t3.setX(350);
+                        t3.setY(200);
+
+                        t4 = new Text("planet. The more waves you survive, the more coins you earn.");
+                        t4.setFont(Font.font("Monospaced", 25));
+                        t4.setFill(Color.WHITE);
+                        t4.setX(350);
+                        t4.setY(250);
+
+                        t5 = new Text("You can spend them on playable skins that are waiting for you");
+                        t5.setFont(Font.font("Monospaced", 25));
+                        t5.setFill(Color.WHITE);
+                        t5.setX(350);
+                        t5.setY(300);
+
+                        t6 = new Text("in a shop. So what are you waiting for? Land on some planet,");
+                        t6.setFont(Font.font("Monospaced", 25));
+                        t6.setFill(Color.WHITE);
+                        t6.setX(350);
+                        t6.setY(350);
+
+                        t7 = new Text("battle aliens and have fun!");
+                        t7.setFont(Font.font("Monospaced", 25));
+                        t7.setFill(Color.WHITE);
+                        t7.setX(350);
+                        t7.setY(400);
+
+                        root.getChildren().add(t1);
+                        root.getChildren().add(t2);
+                        root.getChildren().add(t3);
+                        root.getChildren().add(t4);
+                        root.getChildren().add(t5);
+                        root.getChildren().add(t6);
+                        root.getChildren().add(t7);
+                    }
+                    if (hD.getY() == 370 && !root.getChildren().contains(j1)) {
+                        root.getChildren().remove(t1);
+                        root.getChildren().remove(t2);
+                        root.getChildren().remove(t3);
+                        root.getChildren().remove(t4);
+                        root.getChildren().remove(t5);
+                        root.getChildren().remove(t6);
+                        root.getChildren().remove(t7);
+
+                        j1 = new Text("Space Combat");
+                        j1.setFont(Font.font("Monospaced", 70));
+                        j1.setFill(Color.WHITE);
+                        j1.setX(550);
+                        j1.setY(700);
+
+                        j2 = new Text("Music and sounds");
+                        j2.setFont(Font.font("Monospaced", 35));
+                        j2.setFill(Color.WHITE);
+                        j2.setX(630);
+                        j2.setY(800);
+
+                        j3 = new Text("youtube/8 Bit Universe");
+                        j3.setFont(Font.font("Monospaced", 25));
+                        j3.setFill(Color.WHITE);
+                        j3.setX(630);
+                        j3.setY(850);
+
+                        j4 = new Text("youtube/Gaming Sound FX");
+                        j4.setFont(Font.font("Monospaced", 25));
+                        j4.setFill(Color.WHITE);
+                        j4.setX(625);
+                        j4.setY(890);
+
+                        j5 = new Text("Ufo image and game icon");
+                        j5.setFont(Font.font("Monospaced", 35));
+                        j5.setFill(Color.WHITE);
+                        j5.setX(550);
+                        j5.setY(1000);
+
+                        j6 = new Text("Google graphics");
+                        j6.setFont(Font.font("Monospaced", 25));
+                        j6.setFill(Color.WHITE);
+                        j6.setX(680);
+                        j6.setY(1050);
+
+                        j7 = new Text("All the rest");
+                        j7.setFont(Font.font("Monospaced", 35));
+                        j7.setFill(Color.WHITE);
+                        j7.setX(670);
+                        j7.setY(1160);
+
+                        j8 = new Text("Adrian Cieśla");
+                        j8.setFont(Font.font("Monospaced", 25));
+                        j8.setFill(Color.WHITE);
+                        j8.setX(694);
+                        j8.setY(1210);
+
+                        creditsTimer = new AnimationTimer() {
+
+                            @Override
+                            public void handle(long l) {
+                                j1.setY(j1.getY() - 1.5);
+                                j2.setY(j2.getY() - 1.5);
+                                j3.setY(j3.getY() - 1.5);
+                                j4.setY(j4.getY() - 1.5);
+                                j5.setY(j5.getY() - 1.5);
+                                j6.setY(j6.getY() - 1.5);
+                                j7.setY(j7.getY() - 1.5);
+                                j8.setY(j8.getY() - 1.5);
+
+                            }
+
+                        };
+
+                        root.getChildren().add(j1);
+                        root.getChildren().add(j2);
+                        root.getChildren().add(j3);
+                        root.getChildren().add(j4);
+                        root.getChildren().add(j5);
+                        root.getChildren().add(j6);
+                        root.getChildren().add(j7);
+                        root.getChildren().add(j8);
+
+                        creditsTimer.start();
+
+                    }
                 }
                 break;
             case W:
-                if (!menu && !choosePlanet) {
+                if (!menu && !choosePlanet && !shop && !help) {
                     if (!isPlayerDead) {
                         if (!isJumping && !isFalling && !root.getChildren().contains(imgV)) {
 
@@ -929,7 +1267,7 @@ public class Window extends Application {
                 break;
 
             case SPACE:
-                if (!menu && !choosePlanet && !shop) {
+                if (!menu && !choosePlanet && !shop && !help) {
                     if (!isPlayerDead) {
 
                         shot();
@@ -937,7 +1275,7 @@ public class Window extends Application {
                 }
                 break;
             case E:
-                if (!menu && !choosePlanet) {
+                if (!menu && !choosePlanet && !shop && !help) {
                     if (!isPlayerDead) {
                         if (powershot) {
                             laserShot();
@@ -1029,7 +1367,7 @@ public class Window extends Application {
                             cash.play();
                         }
                     }
-                    if (isBuzzBought) {
+                    if (isDogeBought) {
                         notMoney.setText("");
                         selectedSkin = "doge";
                         boughtSkin.setTranslateX(1040);
@@ -1059,6 +1397,9 @@ public class Window extends Application {
                     }
                     if (av.getY() == 265) {
                         shop();
+                    }
+                    if (av.getY() == 345) {
+                        help();
                     }
                     if (av.getY() == 425) {
                         System.exit(0);
@@ -1099,6 +1440,7 @@ public class Window extends Application {
                     wave = 1;
                     tileSize = 32;
                     aliensRandomness = 0.015;
+                    ufoRandomness = 0.0003;
                     aliensSpeed = 2;
                     ufoSpeed = 5;
 
@@ -1108,16 +1450,26 @@ public class Window extends Application {
                 break;
 
             case Y:
-                music.changeMusic();
+                if (!menu && !choosePlanet && !shop && !help) {
+                    music.changeMusic();
+
+                }
                 break;
             case U:
-                music.stopMusic();
+                if (!menu && !choosePlanet && !shop && !help) {
+                    music.stopMusic();
+                }
                 break;
             case X:
-                if (shop || choosePlanet) {
+                if (shop || choosePlanet || help) {
+
+                    if (hD != null && hD.getY() == 370) {
+                        creditsTimer.stop();
+                    }
 
                     shop = false;
                     choosePlanet = false;
+                    help = false;
 
                     menuTimer.stop();
 
@@ -1363,6 +1715,24 @@ public class Window extends Application {
 
     private void onUpdate() {
         try {
+
+            for (Node shot : ufoShots) {
+                shot.setTranslateY(shot.getTranslateY() + 3);
+
+                Rectangle re = new Rectangle(1500, 10, Color.RED);
+                re.setTranslateX(0);
+                re.setTranslateY(515);
+
+                if (shot.getBoundsInParent().intersects(re.getBoundsInParent())) {
+                    ufoShots.remove(shot);
+                    root.getChildren().remove(shot);
+                }
+                if (player.getBoundsInParent().intersects(shot.getBoundsInParent())) {
+                    root.getChildren().remove(player);
+                    isPlayerDead = true;
+                }
+            }
+
             for (Node shot : rightShots) {
                 shot.setTranslateX(shot.getTranslateX() + 10);
                 for (int i = 0; i < aliensL.size(); i++) {
@@ -1399,6 +1769,40 @@ public class Window extends Application {
 
                     }
                 }
+                for (int i = 0; i < ufosL.size(); i++) {
+                    if (shot.getBoundsInParent().intersects(ufosL.get(i).getBoundsInParent())) {
+                        root.getChildren().remove(ufosL.get(i));
+                        root.getChildren().remove(shot);
+                        leftShots.remove(shot);
+                        ufosL.remove(ufosL.get(i));
+                        if (powershotMeasurer.getWidth() <= 175) {
+                            powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
+
+                        }
+                        if (powershotMeasurer.getWidth() >= 175) {
+                            powershot = true;
+
+                        }
+
+                    }
+                }
+                for (int i = 0; i < ufosR.size(); i++) {
+                    if (shot.getBoundsInParent().intersects(ufosR.get(i).getBoundsInParent())) {
+                        root.getChildren().remove(ufosR.get(i));
+                        root.getChildren().remove(shot);
+                        leftShots.remove(shot);
+                        ufosR.remove(ufosR.get(i));
+                        if (powershotMeasurer.getWidth() <= 175) {
+                            powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
+
+                        }
+                        if (powershotMeasurer.getWidth() >= 175) {
+                            powershot = true;
+
+                        }
+
+                    }
+                }
             }
 
             for (Node shot : leftShots) {
@@ -1420,6 +1824,7 @@ public class Window extends Application {
 
                     }
                 }
+
                 for (int i = 0; i < aliensR.size(); i++) {
                     if (shot.getBoundsInParent().intersects(aliensR.get(i).getBoundsInParent())) {
                         root.getChildren().remove(aliensR.get(i));
@@ -1437,6 +1842,40 @@ public class Window extends Application {
 
                     }
 
+                }
+                for (int i = 0; i < ufosL.size(); i++) {
+                    if (shot.getBoundsInParent().intersects(ufosL.get(i).getBoundsInParent())) {
+                        root.getChildren().remove(ufosL.get(i));
+                        root.getChildren().remove(shot);
+                        leftShots.remove(shot);
+                        ufosL.remove(ufosL.get(i));
+                        if (powershotMeasurer.getWidth() <= 175) {
+                            powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
+
+                        }
+                        if (powershotMeasurer.getWidth() >= 175) {
+                            powershot = true;
+
+                        }
+
+                    }
+                }
+                for (int i = 0; i < ufosR.size(); i++) {
+                    if (shot.getBoundsInParent().intersects(ufosR.get(i).getBoundsInParent())) {
+                        root.getChildren().remove(ufosR.get(i));
+                        root.getChildren().remove(shot);
+                        leftShots.remove(shot);
+                        ufosR.remove(ufosR.get(i));
+                        if (powershotMeasurer.getWidth() <= 175) {
+                            powershotMeasurer.setWidth(powershotMeasurer.getWidth() + 5);
+
+                        }
+                        if (powershotMeasurer.getWidth() >= 175) {
+                            powershot = true;
+
+                        }
+
+                    }
                 }
             }
 
@@ -1471,6 +1910,55 @@ public class Window extends Application {
                 }
 
             }
+            for (Node ufoL : ufosL) {
+                ufoL.setTranslateX(ufoL.getTranslateX() + ufosSpeed);
+
+                if (play && !end) {
+                    if (Math.random() < 0.005) {
+                        Node shot = initUfoShot();
+                        shot.setTranslateX(ufoL.getTranslateX() + 80);
+                        shot.setTranslateY(ufoL.getTranslateY() + 70);
+                        ufoShots.add(shot);
+
+                    }
+                }
+                if (root.getChildren().contains(laser)) {
+                    if (laser.getBoundsInParent().intersects(ufoL.getBoundsInParent())) {
+                        root.getChildren().remove(ufoL);
+                        ufosL.remove(ufoL);
+
+                    }
+                }
+                if (player.getBoundsInParent().intersects(ufoL.getBoundsInParent())) {
+                    root.getChildren().remove(player);
+                    isPlayerDead = true;
+                }
+            }
+            for (Node ufoR : ufosR) {
+                ufoR.setTranslateX(ufoR.getTranslateX() - ufosSpeed);
+                if (play && !end) {
+
+                    if (Math.random() < 0.005) {
+                        Node shot = initUfoShot();
+                        shot.setTranslateX(ufoR.getTranslateX() + 80);
+                        shot.setTranslateY(ufoR.getTranslateY() + 70);
+
+                        ufoShots.add(shot);
+
+                    }
+                }
+                if (root.getChildren().contains(laser)) {
+                    if (laser.getBoundsInParent().intersects(ufoR.getBoundsInParent())) {
+                        root.getChildren().remove(ufoR);
+                        ufosR.remove(ufoR);
+
+                    }
+                }
+                if (player.getBoundsInParent().intersects(ufoR.getBoundsInParent())) {
+                    root.getChildren().remove(player);
+                    isPlayerDead = true;
+                }
+            }
         } catch (Exception e) {
 
         }
@@ -1481,6 +1969,12 @@ public class Window extends Application {
             }
             if (Math.random() < aliensRandomness) {
                 aliensR.add(initAlienR());
+            }
+            if (Math.random() < ufoRandomness) {
+                ufosL.add(initUfoL());
+            }
+            if (Math.random() < ufoRandomness) {
+                ufosR.add(initUfoR());
             }
         }
         if (isPlayerDead) {
@@ -1730,7 +2224,7 @@ public class Window extends Application {
         bu.setY(250);
         bu.setFitWidth(200);
         bu.setFitHeight(200);
-        
+
         Image imgD = new Image("images/doger.png");
         ImageView d = new ImageView(imgD);
         d.setX(1040);
@@ -1789,5 +2283,118 @@ public class Window extends Application {
         root.getChildren().add(notMoney);
 
         root.getChildren().add(cash);
+    }
+
+    public void help() {
+        help = true;
+        menu = false;
+
+        root.getChildren().remove(gameTitle);
+        root.getChildren().remove(playt);
+        root.getChildren().remove(q);
+        root.getChildren().remove(op);
+        root.getChildren().remove(sh);
+        root.getChildren().remove(av);
+        root.getChildren().remove(r);
+        root.getChildren().remove(imgV1);
+        root.getChildren().remove(imgV2);
+        root.getChildren().remove(imgV3);
+        root.getChildren().remove(imgV4);
+
+        Text menu = new Text("Click \"x\" to return to menu");
+        menu.setFont(Font.font("Monospaced", 30));
+        menu.setFill(Color.WHITE);
+        menu.setX(410);
+        menu.setY(600);
+
+        Text controls = new Text("Controls");
+        controls.setFont(Font.font("Monospaced", 30));
+        controls.setFill(Color.WHITE);
+        controls.setX(100);
+        controls.setY(200);
+
+        Text credits = new Text("Credits");
+        credits.setFont(Font.font("Monospaced", 30));
+        credits.setFill(Color.WHITE);
+        credits.setX(100);
+        credits.setY(400);
+
+        Text game = new Text("Game");
+        game.setFont(Font.font("Monospaced", 30));
+        game.setFill(Color.WHITE);
+        game.setX(100);
+        game.setY(300);
+
+        Image a = new Image("images/arrow.png");
+        hD = new ImageView(a);
+        hD.setX(30);
+        hD.setY(170);
+        hD.setFitWidth(50);
+        hD.setFitHeight(50);
+
+        if (hD.getY() == 170) {
+
+            aa = new Text("Move left/Move right - Left arrow/Right arrow");
+            aa.setFont(Font.font("Monospaced", 25));
+            aa.setFill(Color.WHITE);
+            aa.setX(450);
+            aa.setY(100);
+
+            aaa = new Text("Jump - Upward arrow");
+            aaa.setFont(Font.font("Monospaced", 25));
+            aaa.setFill(Color.WHITE);
+            aaa.setX(450);
+            aaa.setY(150);
+
+            aaaa = new Text("Shoot - Space");
+            aaaa.setFont(Font.font("Monospaced", 25));
+            aaaa.setFill(Color.WHITE);
+            aaaa.setX(450);
+            aaaa.setY(200);
+            aaaaa = new Text("Laser Beam - E");
+            aaaaa.setFont(Font.font("Monospaced", 25));
+            aaaaa.setFill(Color.WHITE);
+            aaaaa.setX(450);
+            aaaaa.setY(250);
+
+            aaaaaa = new Text("MLG Glasses - W");
+            aaaaaa.setFont(Font.font("Monospaced", 25));
+            aaaaaa.setFill(Color.WHITE);
+            aaaaaa.setX(450);
+            aaaaaa.setY(300);
+
+            aaaaaaa = new Text("Change music - Y");
+            aaaaaaa.setFont(Font.font("Monospaced", 25));
+            aaaaaaa.setFill(Color.WHITE);
+            aaaaaaa.setX(450);
+            aaaaaaa.setY(350);
+
+            aaaaaaaa = new Text("Mute music - U");
+            aaaaaaaa.setFont(Font.font("Monospaced", 25));
+            aaaaaaaa.setFill(Color.WHITE);
+            aaaaaaaa.setX(450);
+            aaaaaaaa.setY(400);
+
+            root.getChildren().add(aa);
+            root.getChildren().add(aaa);
+            root.getChildren().add(aaaa);
+            root.getChildren().add(aaaaa);
+            root.getChildren().add(aaaaaa);
+            root.getChildren().add(aaaaaaa);
+            root.getChildren().add(aaaaaaaa);
+        }
+
+        root.getChildren().add(menu);
+        root.getChildren().add(controls);
+        root.getChildren().add(credits);
+        root.getChildren().add(game);
+
+        root.getChildren().add(hD);
+    }
+
+    public Node initUfoShot() {
+        Rectangle shot = new Rectangle(10, 40, Color.RED);
+        root.getChildren().add(shot);
+        return shot;
     }
 }
